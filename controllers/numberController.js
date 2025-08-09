@@ -8,8 +8,8 @@ import Service from "../models/serviceModel.js";
 // Configuration from environment variables
 const TELLABOT_CONFIG = {
   apiEndpoint: "https://www.tellabot.com/sims/api_command.php",
-  user: process.env.TELLABOT_USER,
-  apiKey: process.env.TELLABOT_API_KEY,
+  user: process.env.TELLABOT_USER || "Mustafiz",
+  apiKey: process.env.TELLABOT_API_KEY || "ksiL3QFDyZQ1VGOrl23sG87nAqNi3gAz",
 };
 
 class NumberController {

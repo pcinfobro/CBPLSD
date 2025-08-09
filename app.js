@@ -74,9 +74,10 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'SecretKey',
   resave: false,
   saveUninitialized: false, // Changed to false to avoid creating sessions for unauthenticated users
+  rolling: true, // Reset session timeout on each request
   store: MongoStore.create({
     mongoUrl: process.env.DB_URL,
-    touchAfter: 24 * 3600, // Lazy session update - only update session once per 24 hours
+    touchAfter: 300, // Update session every 5 minutes instead of 24 hours
     autoRemove: 'native', // Let MongoDB handle session cleanup
     crypto: {
       secret: process.env.SESSION_SECRET || 'SecretKey'
@@ -85,7 +86,7 @@ app.use(session({
   cookie: { 
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    maxAge: 4 * 60 * 60 * 1000, // Reduced to 4 hours instead of 24
     sameSite: 'lax' // Better security
   }
 }));
@@ -135,7 +136,17 @@ app.set("views", path.join(path.resolve(), "views"));
 
 // Optimized User middleware - cache user data in session to avoid repeated DB queries
 app.use(async (req, res, next) => {
-    if (req.session.userEmail) {
+    // Session health check - prevent hanging sessions
+    if (req.session && req.session.userEmail) {
+        // Check if session is too old or corrupted
+        const sessionAge = Date.now() - (req.session.cookie.originalMaxAge || 0);
+        if (sessionAge > 4 * 60 * 60 * 1000) { // 4 hours
+            console.log('Session expired, destroying session for user:', req.session.userEmail);
+            req.session.destroy();
+            res.locals.user = null;
+            return next();
+        }
+
         // Check if user data is already cached in session
         if (req.session.userData && Date.now() - req.session.userData.lastFetch < 300000) { // 5 minutes cache
             res.locals.user = req.session.userData.user;
@@ -156,11 +167,14 @@ app.use(async (req, res, next) => {
                         lastFetch: Date.now()
                     };
                 } else {
+                    console.log('User not found in database, destroying session for:', req.session.userEmail);
+                    req.session.destroy();
                     res.locals.user = null;
-                    delete req.session.userData;
                 }
             } catch (error) {
                 console.error('User middleware error:', error);
+                // Destroy corrupted session
+                req.session.destroy();
                 res.locals.user = null;
             }
         }

@@ -5,8 +5,8 @@ import User from '../models/userModel.js';
 import CryptoConverter from '../utils/cryptoConverter.js';
 
 
-const MERCHANT_ID = process.env.CRYPTOMUS_MERCHANT_ID;
-const API_KEY = process.env.CRYPTOMUS_API_KEY;
+const MERCHANT_ID = "ca85dfd1-6508-4cb3-ba3c-fbd5af6082c5";
+const API_KEY = "gslwlRD8vbZERq8A9Huqd1SPx7AkwUsta4YlNppZ9WnSyiULUsallZyCfgCwEzdYETUmA4HcYR924Cs74cdDzFQQMa1wwZKqjcuYW82vo7Vu5JPgAtfle7bYAZrmxcI7";
 class PaymentController {
     createPayment = async (req, res) => {
         try {

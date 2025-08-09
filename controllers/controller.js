@@ -13,8 +13,8 @@ import Order from "../models/orderModel.js";
 import Service from "../models/serviceModel.js";
 
 const protectedRoute = (handler) => async (req, res, next) => {
-  const email = req.session.userEmail;
-  if (!email) {
+  const email = req.session?.userEmail;
+  if (!email || !req.session) {
     // Set headers to prevent caching
     res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
     res.header("Expires", "-1");

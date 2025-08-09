@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BINANCE_API_KEY = process.env.BINANCE_API_KEY;
+const BINANCE_API_KEY = '7JH3oKKkSVLbShGeVAA3pC9RzZPbF6ibFPIT52nqL9Dn2bYln1W8Rl05944BPJoC';
 
 class CryptoConverter {
    // In cryptoConverter.js
