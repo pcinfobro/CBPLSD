@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up - CodeBypass</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="assets/images/codebypass-logo/codebypass-icon-white-bg.png">
+<!-- reCAPTCHA script -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<style>
+    /* All your CSS styles remain exactly the same */
+    /* Reset and Base Styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    :root {
+        --primary: #3563E9;
+        --primary-light: #5B81F0;
+        --primary-dark: #2851D1;
+        --secondary: #101828;
+        --accent: #4ADE80;
+        --accent-dark: #2EBD67;
+        --purple: #8B5CF6;
+        --pink: #EC4899;
+        --orange: #F97316;
+        --teal: #14B8A6;
+        --white: #ffffff;
+        --light: #F9FAFB;
+        --gray-50: #F9FAFB;
+        --gray-100: #F3F4F6;
+        --gray-200: #E5E7EB;
+        --gray-300: #D1D5DB;
+        --gray-400: #9CA3AF;
+        --gray-500: #6B7280;
+        --gray-600: #4B5563;
+        --gray-700: #374151;
+        --gray-800: #1F2937;
+        --gray-900: #111827;
+        --error: #EF4444;
+        --error-light: #FEE2E2;
+        --border-radius-sm: 4px;
+        --border-radius: 8px;
+        --border-radius-md: 12px;
+        --border-radius-lg: 16px;
+        --border-radius-xl: 24px;
+        --border-radius-2xl: 32px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --transition: all 0.3s ease;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        line-height: 1.6;
+        color: var(--gray-800);
+        background-color: var(--gray-50);
+        overflow-x: hidden;
+        min-height: 100vh;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    section {
+        padding: 80px 0;
+        position: relative;
+    }
+
+    h1, h2, h3, h4 {
+        margin-bottom: 16px;
+        line-height: 1.2;
+        font-weight: 700;
+    }
+
+    h1 {
+        font-size: 3rem;
+        color: var(--secondary);
+    }
+
+    h2 {
+        font-size: 2.25rem;
+        color: var(--secondary);
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        color: var(--secondary);
+    }
+
+    p {
+        margin-bottom: 16px;
+        font-size: 1rem;
+        color: var(--gray-600);
+    }
+
+    a {
+        text-decoration: none;
+        color: var(--primary);
+        transition: var(--transition);
+    }
+
+    a:hover {
+        color: var(--primary-dark);
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: var(--primary);
+        color: white;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        text-align: center;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn:hover {
+        background-color: var(--primary-dark);
+        color: white;
+        box-shadow: var(--shadow);
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background-color: var(--white);
+        color: var(--primary);
+        border: 1px solid var(--primary);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--primary-light);
+        color: var(--white);
+        border-color: var(--primary-light);
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    /* Header Styles */
+    header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        transition: var(--transition);
+        padding: 17px 0;
+        background-color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--secondary);
+        display: flex;
+        align-items: center;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .logo img {
+        max-height: auto;
+        width: 180px;
+    }
+
+    .nav-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex: 1;
+    }
+
+    .main-nav {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+    }
+
+    .main-nav ul {
+        display: flex;
+        list-style: none;
+        gap: 32px;
+        justify-content: center;
+    }
+
+    .main-nav ul li a {
+        color: var(--gray-700);
+        font-weight: 600;
+        position: relative;
+        padding: 8px 0;
+    }
+
+    .main-nav ul li a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary) 0%, var(--purple) 100%);
+        transition: var(--transition);
+        border-radius: 2px;
+    }
+
+    .main-nav ul li a:hover {
+        color: var(--primary);
+    }
+
+    .main-nav ul li a:hover::after {
+        width: 100%;
+    }
+
+    .auth-nav {
+        display: flex;
+        gap: 12px;
+    }
+
+    .auth-nav .btn {
+        padding: 8px 16px;
+    }
+
+    .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--secondary);
+        z-index: 1001;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .mobile-menu-btn:hover {
+        background-color: rgba(53, 99, 233, 0.1);
+    }
+
+    /* Mobile Navigation */
+    .mobile-nav {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 300px;
+        height: 100vh;
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        box-shadow: -5px 0 30px rgba(0, 0, 0, 0.15);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 1000;
+        padding: 100px 40px 40px;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        border-left: 1px solid rgba(229, 231, 235, 0.5);
+    }
+
+    .mobile-nav.active {
+        right: 0;
+    }
+
+    .mobile-nav-close {
+        position: absolute;
+        top: 25px;
+        right: 25px;
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: var(--secondary);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .mobile-nav-close:hover {
+        background: var(--primary);
+        color: white;
+        transform: rotate(90deg);
+    }
+
+    .mobile-nav-main {
+        margin-bottom: 40px;
+    }
+
+    .mobile-nav-main ul {
+        list-style: none;
+    }
+
+    .mobile-nav-main ul li {
+        margin-bottom: 20px;
+        transform: translateX(20px);
+        opacity: 0;
+        transition: all 0.3s ease;
+        transition-delay: calc(0.05s * var(--i));
+    }
+
+    .mobile-nav.active .mobile-nav-main ul li {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .mobile-nav-main ul li a {
+        color: var(--gray-800);
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: block;
+        padding: 10px 0;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .mobile-nav-main ul li a::before {
+        content: '';
+        position: absolute;
+        left: -15px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--primary);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .mobile-nav-main ul li a:hover {
+        color: var(--primary);
+        transform: translateX(10px);
+    }
+
+    .mobile-nav-main ul li a:hover::before {
+        opacity: 1;
+    }
+
+    .mobile-nav-auth {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.4s ease;
+        transition-delay: 0.3s;
+    }
+
+    .mobile-nav.active .mobile-nav-auth {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .mobile-nav-auth .btn {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 1rem;
+    }
+
+    .mobile-nav-divider {
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(229, 231, 235, 0) 0%, rgba(229, 231, 235, 0.8) 50%, rgba(229, 231, 235, 0) 100%);
+        margin: 20px 0;
+    }
+
+    .mobile-nav-social {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.4s ease;
+        transition-delay: 0.4s;
+    }
+
+    .mobile-nav.active .mobile-nav-social {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .mobile-nav-social a {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(229, 231, 235, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-700);
+        transition: all 0.3s ease;
+    }
+
+    .mobile-nav-social a:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-3px);
+    }
+
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.4s ease;
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+    }
+
+    .overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Footer */
+    footer {
+        background-color: var(--white);
+        color: var(--gray-700);
+        padding: 80px 0 30px;
+        position: relative;
+    }
+
+    .footer-container {
+        position: relative;
+        z-index: 1;
+    }
+
+    .footer-top {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 60px;
+    }
+
+    .footer-logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--secondary);
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .footer-logo img {
+        max-height: 40px;
+        width: auto;
+    }
+
+    .footer-about {
+        margin-bottom: 24px;
+        color: var(--gray-600);
+    }
+
+    .footer-social {
+        display: flex;
+        gap: 12px;
+    }
+
+    .footer-social-link {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--gray-100);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-700);
+        transition: var(--transition);
+    }
+
+    .footer-social-link:hover {
+        background-color: var(--primary);
+        color: var(--white);
+        transform: translateY(-3px);
+    }
+
+    .footer-heading {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--secondary);
+        margin-bottom: 24px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .footer-heading::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 30px;
+        height: 3px;
+        background: var(--primary);
+        border-radius: 2px;
+    }
+
+    .footer-links {
+        list-style: none;
+    }
+
+    .footer-links li {
+        margin-bottom: 12px;
+    }
+
+    .footer-links a {
+        color: var(--gray-600);
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+    }
+
+    .footer-links a i {
+        margin-right: 8px;
+        font-size: 0.8rem;
+        transition: var(--transition);
+    }
+
+    .footer-links a:hover {
+        color: var(--primary);
+        transform: translateX(5px);
+    }
+
+    .footer-links a:hover i {
+        color: var(--primary);
+    }
+
+    .footer-ssl p {
+        margin-bottom: 20px;
+        color: var(--gray-600);
+    }
+
+    .footer-bottom {
+        text-align: center;
+        padding-top: 30px;
+        border-top: 1px solid var(--gray-200);
+        color: var(--gray-500);
+    }
+
+    /* Modern Registration Form Styles */
+    .registration-section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 120px 0 80px;
+        background-color: var(--gray-50);
+        background-image: 
+            radial-gradient(circle at 10% 10%, rgba(53, 99, 233, 0.03) 0%, transparent 20%),
+            radial-gradient(circle at 90% 90%, rgba(139, 92, 246, 0.03) 0%, transparent 20%);
+    }
+
+    .registration-wrapper {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .registration-container {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background: var(--white);
+        border-radius: var(--border-radius-xl);
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .registration-image-container {
+        position: relative;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+    }
+
+    .registration-image-container img {
+        width: 100%;
+        max-width: 320px;
+        height: auto;
+        position: relative;
+        z-index: 2;
+    }
+
+    .registration-image-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("/assets/images/login-sign-up-bg-codebypass.jpeg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-color: rgba(0, 0, 0, 0.6);
+        background-blend-mode: darken;
+        z-index: 1;
+    }
+
+    .registration-form-container {
+        padding: 40px;
+        background: var(--white);
+    }
+
+    .registration-header {
+        margin-bottom: 30px;
+    }
+
+    .registration-header h3 {
+        font-size: 1.8rem;
+        color: var(--secondary);
+        margin-bottom: 10px;
+    }
+
+    .registration-header p {
+        color: var(--gray-500);
+    }
+
+    .registration-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: var(--gray-700);
+        font-size: 0.95rem;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+        transition: var(--transition);
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 14px 16px 14px 45px;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        transition: var(--transition);
+        color: var(--gray-800);
+        background-color: var(--white);
+    }
+
+    .form-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(53, 99, 233, 0.1);
+        outline: none;
+    }
+
+    .form-input:focus + .input-icon {
+        color: var(--primary);
+    }
+
+    .form-input.error {
+        border-color: var(--error);
+        background-color: var(--error-light);
+    }
+
+    .form-input.error + .input-icon {
+        color: var(--error);
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 14px 16px 14px 45px;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        transition: var(--transition);
+        color: var(--gray-800);
+        background-color: var(--white);
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 16px;
+    }
+
+    .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(53, 99, 233, 0.1);
+        outline: none;
+    }
+
+    .form-select:focus + .input-icon {
+        color: var(--primary);
+    }
+
+    .password-toggle {
+        position: relative;
+    }
+
+    .toggle-icon {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-500);
+        cursor: pointer;
+        transition: var(--transition);
+        z-index: 2;
+    }
+
+    .toggle-icon:hover {
+        color: var(--primary);
+    }
+
+    .error-message {
+        color: var(--error);
+        font-size: 0.85rem;
+        margin-top: 4px;
+        display: none;
+    }
+
+    .error-message.visible {
+        display: block;
+    }
+
+    .form-submit {
+        margin-top: 10px;
+        padding: 16px;
+        font-size: 1rem;
+        font-weight: 600;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+    }
+
+    .form-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(53, 99, 233, 0.2);
+    }
+
+    .form-footer {
+        text-align: center;
+        margin-top: 25px;
+        color: var(--gray-600);
+    }
+
+    .form-footer a {
+        font-weight: 600;
+    }
+
+    /* Contact Username Field */
+    .contact-username-group {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Google Sign-in Button */
+    .social-login {
+        margin-bottom: 20px;
+    }
+
+    .google-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 12px;
+        background-color: white;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        color: var(--gray-800);
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .google-btn:hover {
+        background-color: var(--gray-50);
+        box-shadow: var(--shadow);
+        transform: translateY(-2px);
+    }
+
+    .google-btn img {
+        width: 20px;
+        height: 20px;
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 20px 0;
+        color: var(--gray-500);
+        font-size: 0.9rem;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background-color: var(--gray-300);
+    }
+
+    .divider::before {
+        margin-right: 15px;
+    }
+
+    .divider::after {
+        margin-left: 15px;
+    }
+
+    /* reCAPTCHA Container */
+    .recaptcha-container {
+        margin: 10px 0;
+        display: flex;
+        justify-content: center;
+    }
+    #terms-privacy-text h4{
+        font-family: sans-serif;
+        font-size: 16px;
+        font-weight: 320;
+        line-height: 1.4;
+        color:rgba(0, 0, 0, 0.49);
+    }
+
+
+    /* Responsive Styles */
+    @media (max-width: 1200px) {
+        .container {
+            max-width: 100%;
+            padding: 0 40px;
+        }
+
+        .registration-wrapper {
+            max-width: 90%;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .nav-container {
+            display: none;
+        }
+
+        .mobile-menu-btn {
+            display: flex;
+        }
+
+        .footer-top {
+            grid-template-columns: 1fr 1fr;
+        }
+        #terms-privacy-text h4{
+        font-size: 15px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 20px;
+        }
+
+        section {
+            padding: 40px 0;
+        }
+
+        .registration-section {
+            padding: 100px 0 60px;
+        }
+
+        .registration-container {
+            grid-template-columns: 1fr;
+        }
+
+        .registration-image-container {
+            display: none;
+        }
+
+        .registration-form-container {
+            padding: 30px 20px;
+        }
+
+        .registration-header h3 {
+            font-size: 1.6rem;
+        }
+
+        .footer-top {
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+        #terms-privacy-text h4{
+        font-size: 14px;
+        }
+        
+    }
+
+    @media (max-width: 576px) {
+        .logo img {
+            max-height: auto;
+            width: 160px;
+        }
+        .registration-header h3 {
+            font-size: 1.4rem;
+        }
+
+        .form-group {
+            gap: 6px;
+        }
+
+        .form-input, .form-select {
+            padding: 12px 16px 12px 40px;
+            font-size: 0.95rem;
+        }
+
+        .form-submit {
+            padding: 14px;
+        }
+        #terms-privacy-text h4{
+        font-size: 14px;
+        }
+    }
+     /* New styles for contact method input */
+    .contact-method-input {
+        display: none;
+    }
+    
+    .contact-method-input.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .contact-method-label {
+        display: none;
+    }
+    
+    .contact-method-label.active {
+        display: block;
+    }
+</style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+        <a href="/" class="logo">
+            <img src="/assets/images/codebypass-logo/codebypass-logo-full-transparent-black-text.png" alt="CodeByPass">
+        </a>
+            <div class="nav-container">
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/pricing">Pricing</a></li>
+                        <li><a href="/blog">Blog</a></li>
+                        <li><a href="/api">API</a></li>
+                        <li><a href="/contact">Contact Us</a></li>
+                    </ul>
+                </nav>
+                
+                <div class="auth-nav">
+                    <a href="/login" class="btn btn-secondary">Login</a>
+                    <a href="/register" class="btn">Register</a>
+                </div>
+            </div>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+    
+    <!-- Mobile Navigation -->
+    <div class="overlay" id="overlay"></div>
+    <nav class="mobile-nav" id="mobileNav">
+        <button class="mobile-nav-close" id="mobileNavClose">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="mobile-nav-main">
+            <ul>
+                <li style="--i:1"><a href="/">Home</a></li>
+                <li style="--i:2"><a href="/pricing">Pricing</a></li>
+                <li style="--i:3"><a href="/blog">Blog</a></li>
+                <li style="--i:4"><a href="/api">API</a></li>
+                <li style="--i:5"><a href="/contact">Contact Us</a></li>
+            </ul>
+        </div>
+        
+        <div class="mobile-nav-divider"></div>
+        
+        <div class="mobile-nav-auth">
+            <a href="/login" class="btn btn-secondary">Login</a>
+            <a href="/register" class="btn">Register</a>
+        </div>
+        
+        <div class="mobile-nav-social">
+            <a href="#"><i class="fab fa-whatsapp"></i></a>
+            <a href="#"><i class="fab fa-telegram"></i></a>
+            <a href="#"><i class="fab fa-discord"></i></a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+     <main>
+        <!-- Registration Section -->
+        <section class="registration-section">
+            <div class="registration-wrapper">
+                <div class="registration-container">
+                    <div class="registration-image-container"></div>
+                    
+                    <div class="registration-form-container">
+                        <div class="registration-header">
+                            <h3>Create Your Account</h3>
+                            <p>Join CodeBypass for secure SMS verification</p>
+                            <% if (message) { %>
+                                <p class="error-message visible"><%= message %></p>
+                            <% } %>
+                        </div>
+                        
+                        <!-- Google Sign-in Button -->
+                        <div class="social-login">
+                            <a href="/auth/google" class="google-btn">
+                                <img src="/assets/icons/google-logo-codebypass.png" alt="Google logo">
+                                Continue with Google
+                            </a>
+                        </div>
+                        
+                        <div class="divider">OR</div>
+                        
+                        <form class="registration-form" id="registrationForm" action="/user/signup" method="POST">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <div class="input-wrapper">
+                                    <input type="text" id="username" name="username" class="form-input" placeholder="username" autocomplete="off" required>
+                                    <i class="fas fa-user input-icon"></i>
+                                </div>
+                                <div class="error-message" id="usernameError">Please enter a username</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <div class="input-wrapper">
+                                    <input type="email" id="email" name="email" class="form-input" placeholder="your.email@example.com" autocomplete="off" required>
+                                    <i class="fas fa-envelope input-icon"></i>
+                                </div>
+                                <div class="error-message" id="emailError">Please enter a valid email address</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="contactMethod">Preferred Contact Method</label>
+                                <div class="input-wrapper">
+                                    <select id="contactMethod" name="contactMethod" class="form-select" required>
+                                        <option value="" disabled selected>Select your preferred contact method</option>
+                                        <option value="telegram">Telegram</option>
+                                        <option value="teams">Microsoft Teams</option>
+                                        <option value="whatsapp">WhatsApp</option>
+                                        <option value="slack">Slack</option>
+                                        <option value="discord">Discord</option>
+                                    </select>
+                                    <i class="fas fa-comments input-icon"></i>
+                                </div>
+                                <div class="error-message" id="contactMethodError">Please select a contact method</div>
+                            </div>
+
+                             <!-- Dynamic Contact Method Input Fields -->
+                            <div class="form-group contact-method-input" id="telegramInput">
+                                <label for="telegramUsername" class="contact-method-label">Telegram Username</label>
+                                <div class="input-wrapper">
+                                    <input type="text" id="telegramUsername" name="telegramUsername" class="form-input" placeholder="@username" autocomplete="off">
+                                    <i class="fab fa-telegram input-icon"></i>
+                                </div>
+                                <div class="error-message" id="telegramError">Please enter a valid Telegram username (e.g., @username)</div>
+                            </div>
+                            
+                            <div class="form-group contact-method-input" id="whatsappInput">
+                                <label for="whatsappNumber" class="contact-method-label">WhatsApp Number</label>
+                                <div class="input-wrapper">
+                                    <input type="tel" id="whatsappNumber" name="whatsappNumber" class="form-input" placeholder="+1234567890" autocomplete="off">
+                                    <i class="fab fa-whatsapp input-icon"></i>
+                                </div>
+                                <div class="error-message" id="whatsappError">Please enter a valid WhatsApp number with country code (e.g., +1234567890)</div>
+                            </div>
+                            
+                            <div class="form-group contact-method-input" id="teamsInput">
+                                <label for="teamsEmail" class="contact-method-label">Teams Email</label>
+                                <div class="input-wrapper">
+                                    <input type="email" id="teamsEmail" name="teamsEmail" class="form-input" placeholder="your.email@example.com" autocomplete="off">
+                                    <i class="fas fa-envelope input-icon"></i>
+                                </div>
+                                <div class="error-message" id="teamsError">Please enter a valid email address</div>
+                            </div>
+                            
+                            <div class="form-group contact-method-input" id="slackInput">
+                                <label for="slackEmail" class="contact-method-label">Slack Email</label>
+                                <div class="input-wrapper">
+                                    <input type="email" id="slackEmail" name="slackEmail" class="form-input" placeholder="your.email@example.com" autocomplete="off">
+                                    <i class="fab fa-slack input-icon"></i>
+                                </div>
+                                <div class="error-message" id="slackError">Please enter a valid email address</div>
+                            </div>
+                            
+                            <div class="form-group contact-method-input" id="discordInput">
+                                <label for="discordUsername" class="contact-method-label">Discord Username</label>
+                                <div class="input-wrapper">
+                                    <input type="text" id="discordUsername" name="discordUsername" class="form-input" placeholder="username#1234" autocomplete="off">
+                                    <i class="fab fa-discord input-icon"></i>
+                                </div>
+                                <div class="error-message" id="discordError">Please enter a valid Discord username (e.g., username#1234)</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <div class="input-wrapper password-toggle">
+                                    <input type="password" id="password" name="password" class="form-input" placeholder="Create a strong password" autocomplete="off" required>
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <span class="toggle-icon" id="passwordToggle">
+                                        <i class="far fa-eye"></i>
+                                    </span>
+                                </div>
+                                <div class="error-message" id="passwordError">Password is required</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="cpassword">Confirm Password</label>
+                                <div class="input-wrapper password-toggle">
+                                    <input type="password" id="cpassword" name="cpassword" class="form-input" placeholder="Confirm your password" autocomplete="off" required>
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <span class="toggle-icon" id="confirmPasswordToggle">
+                                        <i class="far fa-eye"></i>
+                                    </span>
+                                </div>
+                                <div class="error-message" id="confirmPasswordError">Passwords do not match</div>
+                            </div>
+                            
+                            <!-- reCAPTCHA -->
+                            <div class="recaptcha-container">
+                                <div class="g-recaptcha" data-sitekey="6LcmRHQpAAAAAKox1CmxwgV0Cbh03cU1MTc4si2g"></div>
+                            </div>
+
+                            <!-- Terms and Conditions Text -->
+                            <div id="terms-privacy-text">
+                                <h4>By clicking 'Create Account' you agree to our <a href="/terms">Terms </a>and <a href="/privacy">Privacy Policy</a></h4>
+                            </div>
+                            
+                            <button type="submit" class="btn form-submit">
+                                Create Account
+                            </button>
+                            
+                            <div class="form-footer">
+                                Already have an account? <a href="/user/signin">Login here</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-container">
+            <div class="footer-top">
+                <div>
+                    <div class="footer-logo">
+                        <img src="/assets/images/codebypass-logo/codebypass-logo-full-transparent-black-text.png" alt="CodeByPass">
+                    </div>
+                    <p class="footer-about">CodeByPass is your trusted partner for SMS verification services. We provide reliable, secure phone numbers for all your verification needs, protecting your privacy online.</p>
+                    <div class="footer-social">
+                        <a href="#" class="footer-social-link"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#" class="footer-social-link"><i class="fab fa-telegram"></i></a>
+                        <a href="#" class="footer-social-link"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="footer-heading">Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="/pricing"><i class="fas fa-chevron-right"></i> SMS Verifications</a></li>
+                        <li><a href="/pricing"><i class="fas fa-chevron-right"></i> Number Rentals</a></li>
+                        <li><a href="/pricing"><i class="fas fa-chevron-right"></i> API Access</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="footer-heading">Company</h3>
+                    <ul class="footer-links">
+                        <li><a href="/about"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                        <li><a href="/privacy"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+                        <li><a href="/terms"><i class="fas fa-chevron-right"></i> Terms of Service</a></li>
+                        <li><a href="/faq"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-ssl">
+                    <h3 class="footer-heading">Your Privacy, Our Priority</h3>
+                    <p>We use real U.S. non-VoIP numbers with high success rates. No recycled numbers. No data tracking.</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 CodeByPass. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script>
+        // Mobile Menu Toggle
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const mobileNav = document.getElementById('mobileNav');
+const mobileNavClose = document.getElementById('mobileNavClose');
+const overlay = document.getElementById('overlay');
+
+mobileMenuBtn.addEventListener('click', () => {
+    mobileNav.classList.add('active');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+});
+
+function closeMenu() {
+    mobileNav.classList.remove('active');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+mobileNavClose.addEventListener('click', closeMenu);
+overlay.addEventListener('click', closeMenu);
+
+// Password Toggle
+const passwordToggle = document.getElementById('passwordToggle');
+const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
+const passwordInput = document.getElementById('password');
+const confirmPasswordInput = document.getElementById('cpassword');
+
+passwordToggle.addEventListener('click', () => {
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    passwordToggle.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
+});
+
+confirmPasswordToggle.addEventListener('click', () => {
+    const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    confirmPasswordInput.setAttribute('type', type);
+    confirmPasswordToggle.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
+});
+
+// Sticky Header
+window.addEventListener('scroll', () => {
+    const header = document.querySelector('header');
+    if (window.scrollY > 50) {
+        header.style.padding = '10px 0';
+        header.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)';
+    } else {
+        header.style.padding = '17px 0';
+        header.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)';
+    }
+});
+
+// Contact Method Selection Handler
+const contactMethodSelect = document.getElementById('contactMethod');
+const contactInputs = {
+    telegram: document.getElementById('telegramInput'),
+    whatsapp: document.getElementById('whatsappInput'),
+    teams: document.getElementById('teamsInput'),
+    slack: document.getElementById('slackInput'),
+    discord: document.getElementById('discordInput')
+};
+
+// Show the appropriate input field based on selected contact method
+contactMethodSelect.addEventListener('change', function() {
+    // Hide all contact input fields first
+    Object.values(contactInputs).forEach(input => {
+        input.classList.remove('active');
+        const inputField = input.querySelector('input');
+        inputField.removeAttribute('required');
+        inputField.value = '';
+    });
+    
+    // Show the selected contact method's input field
+    const selectedMethod = this.value;
+    if (selectedMethod && contactInputs[selectedMethod]) {
+        contactInputs[selectedMethod].classList.add('active');
+        const label = contactInputs[selectedMethod].querySelector('.contact-method-label');
+        if (label) label.classList.add('active');
+        
+        // Make the input required
+        const inputField = contactInputs[selectedMethod].querySelector('input');
+        inputField.setAttribute('required', '');
+    }
+});
+
+// Form Validation
+const registrationForm = document.getElementById('registrationForm');
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Update the form validation part of your JavaScript
+registrationForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    let isValid = true;
+    
+    // Reset previous errors
+    const errorMessages = document.querySelectorAll('.error-message');
+    errorMessages.forEach(message => {
+        message.classList.remove('visible');
+    });
+    
+    const inputs = document.querySelectorAll('.form-input');
+    inputs.forEach(input => {
+        input.classList.remove('error');
+    });
+    
+    // Validate Username
+    const username = document.getElementById('username');
+    if (!username.value.trim()) {
+        document.getElementById('usernameError').classList.add('visible');
+        username.classList.add('error');
+        isValid = false;
+    }
+    
+    // Validate Email
+    const email = document.getElementById('email');
+    if (!email.value.trim() || !emailRegex.test(email.value.trim())) {
+        document.getElementById('emailError').classList.add('visible');
+        email.classList.add('error');
+        isValid = false;
+    }
+    
+    // Validate Contact Method
+    const contactMethod = contactMethodSelect.value;
+    if (!contactMethod) {
+        document.getElementById('contactMethodError').classList.add('visible');
+        contactMethodSelect.classList.add('error');
+        isValid = false;
+    } else {
+        // Validate the specific contact method input
+        let contactValid = true;
+        let contactValue = '';
+        
+        switch(contactMethod) {
+            case 'telegram':
+                contactValue = document.getElementById('telegramUsername').value.trim();
+                if (!contactValue) {
+                    document.getElementById('telegramError').textContent = "Telegram username is required";
+                    document.getElementById('telegramError').classList.add('visible');
+                    document.getElementById('telegramUsername').classList.add('error');
+                    contactValid = false;
+                } else if (!/^@?[a-zA-Z0-9_]{5,32}$/.test(contactValue)) {
+                    document.getElementById('telegramError').textContent = "Please enter a valid Telegram username (e.g., @username)";
+                    document.getElementById('telegramError').classList.add('visible');
+                    document.getElementById('telegramUsername').classList.add('error');
+                    contactValid = false;
+                }
+                break;
+                
+            case 'whatsapp':
+                contactValue = document.getElementById('whatsappNumber').value.trim();
+                if (!contactValue) {
+                    document.getElementById('whatsappError').textContent = "WhatsApp number is required";
+                    document.getElementById('whatsappError').classList.add('visible');
+                    document.getElementById('whatsappNumber').classList.add('error');
+                    contactValid = false;
+                } else if (!/^\+[1-9]\d{1,14}$/.test(contactValue)) {
+                    document.getElementById('whatsappError').textContent = "Please enter a valid WhatsApp number with country code (e.g., +1234567890)";
+                    document.getElementById('whatsappError').classList.add('visible');
+                    document.getElementById('whatsappNumber').classList.add('error');
+                    contactValid = false;
+                }
+                break;
+                
+            case 'teams':
+                contactValue = document.getElementById('teamsEmail').value.trim();
+                if (!contactValue || !emailRegex.test(contactValue)) {
+                    document.getElementById('teamsError').textContent = "Please enter a valid email address";
+                    document.getElementById('teamsError').classList.add('visible');
+                    document.getElementById('teamsEmail').classList.add('error');
+                    contactValid = false;
+                }
+                break;
+                
+            case 'slack':
+                contactValue = document.getElementById('slackEmail').value.trim();
+                if (!contactValue || !emailRegex.test(contactValue)) {
+                    document.getElementById('slackError').textContent = "Please enter a valid email address";
+                    document.getElementById('slackError').classList.add('visible');
+                    document.getElementById('slackEmail').classList.add('error');
+                    contactValid = false;
+                }
+                break;
+                
+            case 'discord':
+                contactValue = document.getElementById('discordUsername').value.trim();
+                if (!contactValue) {
+                    document.getElementById('discordError').textContent = "Discord username is required";
+                    document.getElementById('discordError').classList.add('visible');
+                    document.getElementById('discordUsername').classList.add('error');
+                    contactValid = false;
+                } else if (!/^[^#@:]{2,32}#[0-9]{4}$/.test(contactValue)) {
+                    document.getElementById('discordError').textContent = "Please enter a valid Discord username (e.g., username#1234)";
+                    document.getElementById('discordError').classList.add('visible');
+                    document.getElementById('discordUsername').classList.add('error');
+                    contactValid = false;
+                }
+                break;
+        }
+        
+        if (!contactValid) {
+            isValid = false;
+        }
+    }
+    
+    // Validate Password
+    const password = document.getElementById('password');
+    const passwordError = document.getElementById('passwordError');
+    const passwordValue = password.value.trim();
+
+    if (!passwordValue) {
+        passwordError.textContent = "Password is required";
+        passwordError.classList.add('visible');
+        password.classList.add('error');
+        isValid = false;
+    } else if (passwordValue.length < 5) {
+        passwordError.textContent = "Password must be at least 5 characters long";
+        passwordError.classList.add('visible');
+        password.classList.add('error');
+        isValid = false;
+    } else if (!/[A-Z]/.test(passwordValue)) {
+        passwordError.textContent = "Password must contain at least one uppercase letter";
+        passwordError.classList.add('visible');
+        password.classList.add('error');
+        isValid = false;
+    } else if (!/[0-9]/.test(passwordValue)) {
+        passwordError.textContent = "Password must contain at least one number";
+        passwordError.classList.add('visible');
+        password.classList.add('error');
+        isValid = false;
+    }
+    
+    // Validate Confirm Password
+    const confirmPassword = document.getElementById('cpassword');
+    if (password.value !== confirmPassword.value) {
+        document.getElementById('confirmPasswordError').classList.add('visible');
+        confirmPassword.classList.add('error');
+        isValid = false;
+    }
+    
+    // Validate reCAPTCHA
+    const recaptchaResponse = grecaptcha.getResponse();
+    if (!recaptchaResponse) {
+        alert('Please complete the reCAPTCHA verification');
+        isValid = false;
+    }
+    
+    if (isValid) {
+        // Form is valid, submit it
+        this.submit();
+    }
+});
+
+// Initialize the form by triggering the contact method change event
+contactMethodSelect.dispatchEvent(new Event('change'));
+    </script>
+</body>
+</html>

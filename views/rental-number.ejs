@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeByPass - Rental Number</title>
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/rental-number.css">
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <a href="/user/index" class="logo">
+            <div class="logo-container">
+              <div class="logo-icon">
+                <img
+                  src="/assets/images/codebypass-logo/codebypass-icon-white-bg.png"
+                  alt="CodeByPass Icon"
+                />
+              </div>
+              <img
+                src="/assets/images/codebypass-logo/codebypass-logo-white-text-bg.png"
+                alt="CodeByPass"
+                class="logo-text"
+              />
+            </div>
+          </a>
+        </div>
+
+        <div class="sidebar-menu">
+          <ul>
+            <li class="menu-item">
+              <a href="/user/index" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-th-large"></i></span>
+                <span class="menu-text">Dashboard</span>
+              </a>
+            </li>
+
+            <div class="menu-category">Services</div>
+
+            <li class="menu-item">
+              <a href="/user/temporary-number-s1" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-mobile-alt"></i></span>
+                <span class="menu-text">Temporary Number (S1)</span>
+              </a>
+            </li>
+
+            <li class="menu-item">
+              <a href="/user/rental-number" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-phone"></i></span>
+                <span class="menu-text">Rental Number</span>
+              </a>
+            </li>
+
+            <div class="menu-category">Account</div>
+
+            <li class="menu-item">
+              <a href="/user/order-histories" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-history"></i></span>
+                <span class="menu-text">Order Histories</span>
+              </a>
+            </li>
+
+            <li class="menu-item">
+              <a href="/user/deposit" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-wallet"></i></span>
+                <span class="menu-text">Deposit</span>
+                <span class="menu-badge"
+                  >$<%= user ? (user.balance || '0.00') : '0.00' %></span
+                >
+              </a>
+            </li>
+
+            <li class="menu-item">
+              <a href="/user/tickets" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-ticket-alt"></i></span>
+                <span class="menu-text">Tickets</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Sidebar Toggle -->
+      <div class="sidebar-toggle-container">
+        <button class="sidebar-toggle" id="sidebarToggle">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+          <div class="header-left">
+            <button class="mobile-toggle" id="mobileToggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+
+          <div class="header-right">
+            <div class="balance-display">
+              <i class="fas fa-wallet balance-icon"></i>
+              <span class="balance-amount"
+                >$<%= user ? (user.balance || '0.00') : '0.00' %></span
+              >
+            </div>
+
+            <a href="/user/deposit" class="add-funds-btn">
+              <i class="fas fa-plus-circle"></i>
+              <span>Add Funds</span>
+            </a>
+
+            <div class="user-dropdown" id="userDropdown">
+              <div class="header-avatar">
+                <%= user ? user.username.charAt(0).toUpperCase() : 'U' %>
+              </div>
+              <div class="header-user-info">
+                <div class="header-user-name">
+                  <%= user ? user.username : 'User' %>
+                </div>
+                <div class="header-user-role">
+                  <%= user ? user.role : 'Member' %>
+                </div>
+              </div>
+              <i class="fas fa-chevron-down"></i>
+
+              <!-- Dropdown Menu -->
+              <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-header">
+                  <div class="dropdown-user-info">
+                    <div class="dropdown-user-name">
+                      <%= user ? user.username : 'User' %>
+                    </div>
+                    <div class="dropdown-user-email">
+                      <%= user ? user.email : 'user@example.com' %>
+                    </div>
+                  </div>
+                </div>
+                <div class="dropdown-body">
+                  <a href="/user/user-profile" class="dropdown-item">
+                    <i class="fas fa-user"></i>
+                    <span>My Profile</span>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <div class="dropdown-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help Center</span>
+                  </div>
+                  <div class="dropdown-divider"></div>
+                  <div class="dropdown-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Log Out</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="content">
+          <div class="section-header">
+            <h2 class="section-title">Rental Number</h2>
+            <p class="section-subtitle">
+              Rent phone numbers for longer periods.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-info-circle"></i> How it works?
+              </h3>
+            </div>
+            <div class="card-body">
+              <p>
+                At present, we exclusively offer USA rental numbers. To place an
+                order for a Rental number, first, choose the Service and then
+                select your preferred State. The price will be displayed under
+                the service menu selection. The rental period for the number is
+                30 days, but you can easily extend it by renewing before the
+                period ends. We also offer a 3-day rental option at a fraction
+                of the price.
+              </p>
+            </div>
+          </div>
+          <br />
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-phone"></i> Advanced Order
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <h4>Configure Number</h4>
+                <div class="row">
+                  <div class="form-group">
+                    <label for="rental-service" class="form-label"
+                      >Service</label
+                    >
+
+                    <div
+                      class="searchable-dropdown"
+                      id="rental-service-dropdown"
+                    >
+                      <div
+                        class="dropdown-toggle"
+                        onclick="toggleDropdown('rental-service-dropdown')"
+                      >
+                        <span class="selected-text">Select Service ...</span>
+                        <i class="fas fa-chevron-down"></i>
+                      </div>
+                      <div class="dropdown-menu">
+                        <div class="search-box">
+                          <i class="fas fa-search"></i>
+                          <input
+                            type="text"
+                            placeholder="Search services..."
+                            oninput="filterServices('rental-service-dropdown', this.value)"
+                          />
+                        </div>
+
+                        <div
+                          class="dropdown-options"
+                          id="rental-service-options"
+                        >
+                          <!-- Services will be loaded dynamically -->
+                          <div class="option">
+                            <span class="option-text">Loading services...</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <input type="hidden" id="rental-service" name="service" />
+                  </div>
+                  <div class="form-group">
+                    <label for="rental-state" class="form-label">State</label>
+                    <select class="form-select" id="rental-state">
+                      <option value="random" selected>Random Location</option>
+                      <% states.forEach(state => { %>
+                      <option value="<%= state.value %>">
+                        <%= state.name %>
+                      </option>
+                      <% }); %>
+                    </select>
+                  </div>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    gap: 1rem;
+                    margin-top: 1rem;
+                    flex-wrap: wrap;
+                  "
+                >
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="createRentalOrder('3days')"
+                  >
+                    <i class="fas fa-calendar-alt"></i> Order for (3 days) -
+                    <span id="price-3days">$0.00</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="createRentalOrder('30days')"
+                  >
+                    <i class="fas fa-calendar-check"></i> Order for (30 days) -
+                    <span id="price-30days">$0.00</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br />
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-sms"></i> Rental History
+              </h3>
+              <button
+                class="btn btn-outline btn-sm"
+                onclick="forceRefreshRentals()"
+              >
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
+              <button class="btn btn-outline btn-sm" onclick="testAPI()">
+                <i class="fas fa-vial"></i> Test API
+              </button>
+            </div>
+            <div class="card-body">
+              <!-- Filters Section -->
+              <div class="rental-filters">
+                <div class="filter-row">
+                  <div class="filter-group">
+                    <label>Status Filter:</label>
+                    <select id="status-filter" onchange="applyFilters()">
+                      <option value="">All Statuses</option>
+                      <option value="active">Active</option>
+                      <option value="expired">Expired</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </div>
+                  <div class="filter-group">
+                    <label>Duration Filter:</label>
+                    <select id="duration-filter" onchange="applyFilters()">
+                      <option value="">All Durations</option>
+                      <option value="3days">3 Days</option>
+                      <option value="30days">30 Days</option>
+                    </select>
+                  </div>
+                  <div class="filter-group">
+                    <label>Service Filter:</label>
+                    <select id="service-filter" onchange="applyFilters()">
+                      <option value="">All Services</option>
+                    </select>
+                  </div>
+                  <div class="filter-group">
+                    <label>Date Range:</label>
+                    <div class="date-range-filter">
+                      <input
+                        type="date"
+                        id="date-from"
+                        onchange="applyFilters()"
+                      />
+                      <span>to</span>
+                      <input
+                        type="date"
+                        id="date-to"
+                        onchange="applyFilters()"
+                      />
+                    </div>
+                  </div>
+                  <div class="filter-group">
+                    <button
+                      type="button"
+                      class="btn btn-outline btn-sm"
+                      onclick="clearFilters()"
+                    >
+                      <i class="fas fa-times"></i> Clear Filters
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input
+                  type="text"
+                  class="search-input"
+                  placeholder="Search rentals by number, service, or transaction ID..."
+                  oninput="searchRentals(this.value)"
+                />
+              </div>
+              <div class="table-container table-responsive-card">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Created at</th>
+                      <th>Number</th>
+                      <th>Service</th>
+                      <th>Duration</th>
+                      <th>Status</th>
+                      <th>Expires At</th>
+                      <th>Price</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rentals-table-body">
+                    <tr>
+                      <td data-label="No Data" colspan="8" class="table-empty">
+                        Loading rentals...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- JavaScript -->
+    <!-- Add this script section at the bottom of the file, before the closing </body> tag -->
+    <script>
+      // API Helper Functions
+      // DOM Elements
+      const sidebar = document.getElementById("sidebar");
+      const sidebarToggle = document.getElementById("sidebarToggle");
+      const mobileToggle = document.getElementById("mobileToggle");
+      const overlay = document.getElementById("overlay");
+      const userDropdown = document.getElementById("userDropdown");
+      const dropdownMenu = document.getElementById("dropdownMenu");
+
+      // Toggle Sidebar (Desktop)
+      sidebarToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("sidebar-collapsed");
+      });
+
+      // Toggle Sidebar (Mobile)
+      mobileToggle.addEventListener("click", () => {
+        sidebar.classList.add("active");
+        overlay.classList.add("active");
+        document.body.style.overflow = "hidden";
+      });
+
+      // Close Sidebar on Overlay Click
+      overlay.addEventListener("click", () => {
+        sidebar.classList.remove("active");
+        overlay.classList.remove("active");
+        document.body.style.overflow = "";
+      });
+
+      // User Dropdown
+      userDropdown.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle("active");
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener("click", () => {
+        dropdownMenu.classList.remove("active");
+      });
+
+      // Tab Functionality
+      const tabs = document.querySelectorAll(".history-tab");
+      const tabContents = document.querySelectorAll(".history-tab-content");
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          // Remove active class from all tabs
+          tabs.forEach((t) => t.classList.remove("active"));
+
+          // Add active class to clicked tab
+          tab.classList.add("active");
+
+          // Show corresponding tab content
+          const tabId = tab.id;
+          const contentId = tabId + "-content";
+
+          tabContents.forEach((content) => {
+            content.classList.remove("active");
+            if (content.id === contentId) {
+              content.classList.add("active");
+            }
+          });
+        });
+      });
+
+      // Handle window resize
+      window.addEventListener("resize", function () {
+        if (window.innerWidth >= 992 && overlay.classList.contains("active")) {
+          overlay.classList.remove("active");
+          document.body.style.overflow = "";
+        }
+
+        // Close dropdown on resize
+        dropdownMenu.classList.remove("active");
+      });
+
+      // Fix for iOS 100vh issue
+      function setVH() {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty("--vh", `${vh}px`);
+      }
+
+      window.addEventListener("resize", setVH);
+      setVH();
+      // Function to refresh balance display
+      function refreshBalance() {
+        fetch("/user/api/profile-data")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              // Update all balance displays on the page
+              const balanceElements = document.querySelectorAll(
+                ".balance-amount, .menu-badge"
+              );
+              balanceElements.forEach((el) => {
+                el.textContent = `$${(data.user?.balance || 0).toFixed(2)}`;
+              });
+            }
+          })
+          .catch((err) => console.error("Error refreshing balance:", err));
+      }
+
+      // Clean up intervals on page unload
+      window.addEventListener("beforeunload", function() {
+        console.log("Page unloading, cleaning up intervals...");
+        if (window.balanceRefreshInterval) {
+          clearInterval(window.balanceRefreshInterval);
+          window.balanceRefreshInterval = null;
+        }
+        if (window.rentalsRefreshInterval) {
+          clearInterval(window.rentalsRefreshInterval);
+          window.rentalsRefreshInterval = null;
+        }
+      });
+
+      // Pause intervals when page is not visible to reduce resource usage
+      document.addEventListener("visibilitychange", function() {
+        if (document.hidden) {
+          console.log("Page hidden, pausing intervals...");
+          if (window.balanceRefreshInterval) {
+            clearInterval(window.balanceRefreshInterval);
+            window.balanceRefreshInterval = null;
+          }
+          if (window.rentalsRefreshInterval) {
+            clearInterval(window.rentalsRefreshInterval);
+            window.rentalsRefreshInterval = null;
+          }
+        } else {
+          console.log("Page visible, resuming intervals...");
+          // Resume intervals when page becomes visible
+          if (!window.balanceRefreshInterval) {
+            window.balanceRefreshInterval = setInterval(refreshBalance, 30000);
+          }
+          if (!window.rentalsRefreshInterval) {
+            window.rentalsRefreshInterval = setInterval(loadRentals, 120000);
+          }
+          // Immediate refresh when page becomes visible
+          refreshBalance();
+          loadRentals();
+        }
+      });
+
+      // Update the logout functionality to clear intervals
+      function setupLogoutHandler() {
+        const logoutButton = document.querySelector(".dropdown-item:last-child");
+        if (logoutButton) {
+          logoutButton.addEventListener("click", function (e) {
+            e.preventDefault();
+            // Clear any intervals before logging out
+            if (window.balanceRefreshInterval) clearInterval(window.balanceRefreshInterval);
+            if (window.rentalsRefreshInterval) clearInterval(window.rentalsRefreshInterval);
+            window.location.href = "/user/signout";
+          });
+        }
+      }
+
+      function showAlert(message, type = "error") {
+        // Remove existing alerts
+        document.querySelectorAll(".api-alert").forEach((el) => el.remove());
+
+        const alertDiv = document.createElement("div");
+        alertDiv.className = `api-alert alert alert-${type}`;
+        alertDiv.textContent = message;
+
+        const content = document.querySelector(".content");
+        content.insertBefore(alertDiv, content.firstChild);
+
+        setTimeout(() => alertDiv.remove(), 5000);
+      }
+
+      // DOM Elements
+      const serviceSelect = document.getElementById("rental-service");
+      const stateSelect = document.getElementById("rental-state");
+      const rentalsTableBody = document.getElementById("rentalHistoryBody");
+
+      // Global Variables
+      let currentRentals = [];
+      let filteredRentals = [];
+      let selectedService = null;
+
+      // Make dropdown functions globally accessible
+      window.toggleDropdown = function (dropdownId) {
+        console.log("Toggle dropdown called for:", dropdownId); // Debug log
+        const dropdown = document.getElementById(dropdownId);
+        if (!dropdown) {
+          console.error("Dropdown not found:", dropdownId);
+          return;
+        }
+
+        const menu = dropdown.querySelector(".dropdown-menu");
+        const toggle = dropdown.querySelector(".dropdown-toggle");
+
+        if (!menu || !toggle) {
+          console.error("Menu or toggle not found in dropdown:", dropdownId);
+          return;
+        }
+
+        console.log("Current menu classes:", menu.className); // Debug log
+
+        // Close all other dropdowns first
+        document.querySelectorAll(".dropdown-menu.show").forEach((el) => {
+          if (el !== menu) {
+            el.classList.remove("show");
+            el.parentElement
+              .querySelector(".dropdown-toggle")
+              .classList.remove("active");
+          }
+        });
+
+        // Toggle current dropdown
+        menu.classList.toggle("show");
+        toggle.classList.toggle("active");
+
+        console.log("After toggle - menu classes:", menu.className); // Debug log
+
+        // Clear search when opening
+        if (menu.classList.contains("show")) {
+          const searchInput = menu.querySelector("input");
+          if (searchInput) {
+            searchInput.value = "";
+            window.filterServices(dropdownId, "");
+          }
+        }
+      };
+
+      window.filterServices = function (dropdownId, searchTerm) {
+        const dropdown = document.getElementById(dropdownId);
+        const options = dropdown.querySelectorAll(".option");
+
+        options.forEach((option) => {
+          const text = option
+            .querySelector(".option-text")
+            .textContent.toLowerCase();
+          if (text.includes(searchTerm.toLowerCase())) {
+            option.style.display = "flex";
+          } else {
+            option.style.display = "none";
+          }
+        });
+      };
+
+      window.selectRentalService = function (optionElement) {
+        const dropdown = optionElement.closest(".searchable-dropdown");
+        const selectedText = dropdown.querySelector(".selected-text");
+        const hiddenInput = document.getElementById("rental-service");
+        const toggle = dropdown.querySelector(".dropdown-toggle");
+        const menu = dropdown.querySelector(".dropdown-menu");
+
+        // Remove selected class from all options
+        dropdown
+          .querySelectorAll(".option")
+          .forEach((opt) => opt.classList.remove("selected"));
+
+        // Add selected class to clicked option
+        optionElement.classList.add("selected");
+
+        // Update display text and hidden input
+        const serviceName = optionElement.dataset.name;
+        const serviceValue = optionElement.dataset.value;
+        const shortPrice = optionElement.dataset.ltrShortPrice;
+        const fullPrice = optionElement.dataset.ltrPrice;
+
+        selectedText.textContent = serviceName;
+        hiddenInput.value = serviceValue;
+
+        // Store prices as data attributes on the hidden input for easy access
+        hiddenInput.setAttribute("data-short-price", shortPrice);
+        hiddenInput.setAttribute("data-full-price", fullPrice);
+
+        // Update price buttons
+        document.getElementById("price-3days").textContent = `$${shortPrice}`;
+        document.getElementById("price-30days").textContent = `$${fullPrice}`;
+
+        // Close dropdown
+        menu.classList.remove("show");
+        toggle.classList.remove("active");
+
+        console.log(
+          "Selected service:",
+          serviceName,
+          "Value:",
+          serviceValue,
+          "Short Price:",
+          shortPrice,
+          "Full Price:",
+          fullPrice
+        );
+      };
+
+      // Function to create rental order
+      window.createRentalOrder = function (duration) {
+        const selectedServiceInput = document.getElementById("rental-service");
+        const selectedState = document.getElementById("rental-state");
+
+        console.log("Selected service input:", selectedServiceInput.value);
+        console.log("Service data attributes:", {
+          shortPrice: selectedServiceInput.getAttribute("data-short-price"),
+          fullPrice: selectedServiceInput.getAttribute("data-full-price"),
+        });
+
+        if (!selectedServiceInput.value) {
+          showAlert("Please select a service", "error");
+          return;
+        }
+
+        const price =
+          duration === "3days"
+            ? selectedServiceInput.getAttribute("data-short-price")
+            : selectedServiceInput.getAttribute("data-full-price");
+
+        if (!price) {
+          showAlert(
+            "Price information not available. Please reselect the service.",
+            "error"
+          );
+          return;
+        }
+
+        const serviceName = selectedServiceInput.value;
+        const state = selectedState.value;
+
+        console.log("Creating rental order with:", {
+          service: serviceName,
+          state: state,
+          duration: duration,
+          price: parseFloat(price),
+        });
+
+        showAlert("Creating rental order...", "info");
+
+        // API call to create the rental order
+        fetch("/user/api/rentals/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            service: serviceName,
+            state: state,
+            duration: duration,
+            price: parseFloat(price),
+          }),
+        })
+          .then((response) => {
+            console.log("Response status:", response.status);
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Response data:", data);
+            if (data.success) {
+              showAlert("Rental order created successfully!", "success");
+              console.log(
+                "Order created successfully, clearing form and refreshing data..."
+              );
+              // Clear the form
+              selectedServiceInput.value = "";
+              document.querySelector(".selected-text").textContent =
+                "Select Service ...";
+              document.getElementById("price-3days").textContent = "$0.00";
+              document.getElementById("price-30days").textContent = "$0.00";
+              // Refresh the rentals list and balance with a small delay to ensure backend is updated
+              setTimeout(() => {
+                console.log("Calling loadRentals after order creation...");
+                loadRentals();
+                refreshBalance();
+              }, 1000);
+
+              // Also try an immediate refresh in case the delay isn't needed
+              setTimeout(() => {
+                console.log("Second loadRentals call after order creation...");
+                loadRentals();
+              }, 2500);
+            } else {
+              showAlert(
+                data.message || "Failed to create rental order",
+                "error"
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            showAlert("Failed to create rental order", "error");
+          });
+      };
+
+      // Function to test API connectivity
+      function testAPI() {
+        console.log("🧪 Testing API connectivity...");
+        showAlert("Testing API...", "info");
+
+        // First test unprotected endpoint
+        console.log("🏓 Testing ping endpoint...");
+        fetch("/user/api/ping")
+          .then((response) => {
+            console.log("🏓 Ping response status:", response.status);
+            return response.json();
+          })
+          .then((data) => {
+            console.log("🏓 Ping response data:", data);
+            showAlert(
+              "Ping test successful! Testing protected endpoint...",
+              "success"
+            );
+
+            // Now test protected endpoint
+            return fetch("/user/api/test");
+          })
+          .then((response) => {
+            console.log("🧪 Test API response status:", response.status);
+            return response.json();
+          })
+          .then((data) => {
+            console.log("🧪 Test API response data:", data);
+            showAlert("Protected API test successful!", "success");
+          })
+          .catch((error) => {
+            console.error("🧪 API test error:", error);
+            showAlert("API test failed: " + error.message, "error");
+          });
+      }
+
+      // Function to test ping (unprotected endpoint)
+      function testPing() {
+        console.log("🏓 Testing ping endpoint...");
+        showAlert("Testing ping...", "info");
+
+        fetch("/user/api/ping")
+          .then((response) => {
+            console.log("🏓 Ping response status:", response.status);
+            return response.json();
+          })
+          .then((data) => {
+            console.log("🏓 Ping response data:", data);
+            showAlert("Ping successful!", "success");
+          })
+          .catch((error) => {
+            console.error("🏓 Ping error:", error);
+            showAlert("Ping failed: " + error.message, "error");
+          });
+      }
+
+      // Function to force refresh rentals (for manual refresh button)
+      function forceRefreshRentals() {
+        console.log("Force refreshing rentals...");
+        showAlert("Refreshing rentals...", "info");
+
+        // Clear current data
+        currentRentals = [];
+        filteredRentals = [];
+
+        // Load fresh data
+        loadRentals();
+      }
+
+      // Function to load rentals
+      function loadRentals() {
+        console.log("Loading rentals..."); // Debug log
+
+        // Show loading state
+        const tbody = document.getElementById("rentals-table-body");
+        if (tbody) {
+          tbody.innerHTML =
+            '<tr><td data-label="Loading" colspan="8" class="table-empty">Loading rentals...</td></tr>';
+        }
+
+        console.log("🚀 Starting fetch request to /user/api/rentals"); // Debug log
+        fetch("/user/api/rentals")
+          .then((response) => {
+            console.log("✅ Fetch response received"); // Debug log
+            console.log("Response status:", response.status); // Debug log
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Raw API response:", JSON.stringify(data, null, 2)); // Debug log
+            console.log("Rentals data received:", data); // Debug log
+            console.log("Data structure:", {
+              success: data.success,
+              hasRentals: !!data.rentals,
+              rentalsCount: data.rentals ? data.rentals.length : 0,
+              rentalsArray: data.rentals,
+            });
+
+            if (data.success) {
+              console.log(
+                "Number of rentals:",
+                data.rentals ? data.rentals.length : 0
+              ); // Debug log
+              currentRentals = data.rentals || [];
+              filteredRentals = [...currentRentals];
+              updateRentalsTable(filteredRentals);
+              populateServiceFilter();
+
+              if (currentRentals.length > 0) {
+                showAlert(
+                  `Loaded ${currentRentals.length} rental(s)`,
+                  "success"
+                );
+              } else {
+                console.log("No rentals found in successful response");
+              }
+            } else {
+              console.log("API returned error:", data.message);
+              currentRentals = [];
+              filteredRentals = [];
+              updateRentalsTable(filteredRentals);
+              showAlert(data.message || "No rentals found", "info");
+            }
+          })
+          .catch((error) => {
+            console.error("Error loading rentals:", error);
+            currentRentals = [];
+            filteredRentals = [];
+            updateRentalsTable(filteredRentals);
+            showAlert("Failed to load rentals", "error");
+          });
+      }
+
+      // Function to update rentals table
+      function updateRentalsTable(rentals) {
+        console.log("Updating table with rentals:", rentals); // Debug log
+        const tbody = document.getElementById("rentals-table-body");
+        // Debug log
+
+        if (!tbody) {
+          console.error("Table body element not found!");
+          return;
+        }
+
+        tbody.innerHTML = "";
+
+        if (!rentals || rentals.length === 0) {
+          tbody.innerHTML =
+            '<tr><td data-label="No Data" colspan="8" class="table-empty">No records found</td></tr>';
+          return;
+        }
+
+        console.log("Processing", rentals.length, "rentals"); // Debug log
+        rentals.forEach((rental, index) => {
+          console.log("Processing rental", index, ":", rental); // Debug log
+
+          // Ensure rental object has required properties
+          if (!rental) {
+            console.warn("Rental object is null or undefined at index", index);
+            return;
+          }
+
+          const row = document.createElement("tr");
+          const statusClass =
+            rental.status === "active"
+              ? "success"
+              : rental.status === "expired"
+              ? "warning"
+              : "danger";
+          const durationBadge =
+            rental.duration === "3days" ? "duration-3days" : "duration-30days";
+
+          row.innerHTML = `
+            <td data-label="Created at">${
+              rental.createdAt
+                ? new Date(rental.createdAt).toLocaleString()
+                : "N/A"
+            }</td>
+            <td data-label="Number">
+              <div class="number-cell">
+                <span class="phone-number">${rental.number || "Pending"}</span>
+                ${
+                  rental.number
+                    ? `<button class="copy-btn" onclick="copyToClipboard('${rental.number}')" title="Copy number">
+                  <i class="fas fa-copy"></i>
+                </button>`
+                    : ""
+                }
+              </div>
+            </td>
+            <td data-label="Service">${rental.service || "N/A"}</td>
+            <td data-label="Duration">
+              <span class="badge ${durationBadge}">${
+            rental.duration === "3days" ? "3 Days" : "30 Days"
+          }</span>
+            </td>
+            <td data-label="Status">
+              <span class="badge badge-${statusClass}">${
+            rental.status || "pending"
+          }</span>
+            </td>
+            <td data-label="Expires At">${
+              rental.expiresAt
+                ? new Date(rental.expiresAt).toLocaleString()
+                : "N/A"
+            }</td>
+            <td data-label="Price">$${(rental.price || 0).toFixed(2)}</td>
+            <td data-label="Actions" class="actions-cell">
+              <div class="action-buttons">
+                
+                <button class="action-btn dislike-btn ${
+                  rental.actions?.dislike ? "active" : ""
+                }" 
+                        onclick="toggleAction('${
+                          rental._id || rental.id
+                        }', 'dislike')" 
+                        title="Toggle Dislike" data-action="dislike">
+                  <i class="fas fa-thumbs-down"></i>
+                </button>
+            
+                <button class="action-btn renew-btn" onclick="renewOrder('${
+                  rental._id || rental.id
+                }')" 
+                        title="Renew Order" data-action="renew">
+                  <i class="fas fa-redo"></i>
+                </button>
+              </div>
+            </td>
+          `;
+          console.log(
+            "Appending row to table for rental:",
+            rental.id || rental._id
+          ); // Debug log
+          tbody.appendChild(row);
+        });
+        console.log("Finished updating table"); // Debug log
+      }
+
+      // Filter functions
+      function applyFilters() {
+        const statusFilter = document.getElementById("status-filter").value;
+        const durationFilter = document.getElementById("duration-filter").value;
+        const serviceFilter = document.getElementById("service-filter").value;
+        const dateFrom = document.getElementById("date-from").value;
+        const dateTo = document.getElementById("date-to").value;
+
+        filteredRentals = currentRentals.filter((rental) => {
+          // Status filter
+          if (statusFilter && rental.status !== statusFilter) return false;
+
+          // Duration filter
+          if (durationFilter && rental.duration !== durationFilter)
+            return false;
+
+          // Service filter
+          if (
+            serviceFilter &&
+            rental.service.toLowerCase() !== serviceFilter.toLowerCase()
+          )
+            return false;
+
+          // Date range filter
+          if (dateFrom) {
+            const fromDate = new Date(dateFrom);
+            if (new Date(rental.createdAt) < fromDate) return false;
+          }
+
+          if (dateTo) {
+            const toDate = new Date(dateTo);
+            toDate.setHours(23, 59, 59, 999);
+            if (new Date(rental.createdAt) > toDate) return false;
+          }
+
+          return true;
+        });
+
+        updateRentalsTable(filteredRentals);
+      }
+
+      function clearFilters() {
+        document.getElementById("status-filter").value = "";
+        document.getElementById("duration-filter").value = "";
+        document.getElementById("service-filter").value = "";
+        document.getElementById("date-from").value = "";
+        document.getElementById("date-to").value = "";
+
+        filteredRentals = [...currentRentals];
+        updateRentalsTable(filteredRentals);
+      }
+
+      function searchRentals(searchTerm) {
+        if (!searchTerm.trim()) {
+          updateRentalsTable(filteredRentals);
+          return;
+        }
+
+        const searchResults = filteredRentals.filter((rental) => {
+          const searchString = `${rental.number} ${rental.service} ${
+            rental.transactionId || ""
+          }`.toLowerCase();
+          return searchString.includes(searchTerm.toLowerCase());
+        });
+
+        updateRentalsTable(searchResults);
+      }
+
+      function populateServiceFilter() {
+        const serviceFilter = document.getElementById("service-filter");
+        const services = [
+          ...new Set(currentRentals.map((rental) => rental.service)),
+        ];
+
+        // Clear existing options except the first one
+        serviceFilter.innerHTML = '<option value="">All Services</option>';
+
+        services.forEach((service) => {
+          const option = document.createElement("option");
+          option.value = service;
+          option.textContent = service;
+          serviceFilter.appendChild(option);
+        });
+      }
+
+      // Action functions
+      function checkMessages(rentalId) {
+        showAlert("Checking messages...", "info");
+
+        fetch(`/user/api/rentals/${rentalId}/messages`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              if (data.messages && data.messages.length > 0) {
+                showAlert(
+                  `Found ${data.messages.length} message(s)`,
+                  "success"
+                );
+                // You can implement a modal to show messages here
+              } else {
+                showAlert("No new messages found", "info");
+              }
+            } else {
+              showAlert(data.message || "Failed to check messages", "error");
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            showAlert("Failed to check messages", "error");
+          });
+      }
+
+      function extendRental(rentalId) {
+        if (confirm("Are you sure you want to extend this rental?")) {
+          showAlert("Extending rental...", "info");
+
+          fetch(`/user/api/rentals/${rentalId}/extend`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                showAlert("Rental extended successfully!", "success");
+                loadRentals();
+                refreshBalance();
+              } else {
+                showAlert(data.message || "Failed to extend rental", "error");
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              showAlert("Failed to extend rental", "error");
+            });
+        }
+      }
+
+      function cancelRental(rentalId) {
+        if (
+          confirm(
+            "Are you sure you want to cancel this rental? This action cannot be undone."
+          )
+        ) {
+          showAlert("Cancelling rental...", "info");
+
+          fetch(`/user/api/rentals/${rentalId}/cancel`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                showAlert("Rental cancelled successfully!", "success");
+                loadRentals();
+                refreshBalance();
+              } else {
+                showAlert(data.message || "Failed to cancel rental", "error");
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              showAlert("Failed to cancel rental", "error");
+            });
+        }
+      }
+
+      function reorderRental(rentalId) {
+        const rental = currentRentals.find((r) => r.id === rentalId);
+        if (rental) {
+          // Auto-fill the form with the rental details
+          const serviceDropdown = document.getElementById(
+            "rental-service-dropdown"
+          );
+          const selectedText = serviceDropdown.querySelector(".selected-text");
+          const hiddenInput = document.getElementById("rental-service");
+          const stateSelect = document.getElementById("rental-state");
+
+          // Set the service
+          selectedText.textContent = rental.service;
+          hiddenInput.value = rental.service;
+
+          // Set the state if available
+          if (rental.state && stateSelect) {
+            stateSelect.value = rental.state;
+          }
+
+          // Try to find the service option to get pricing
+          const serviceOption = serviceDropdown.querySelector(
+            `[data-value="${rental.service}"]`
+          );
+          if (serviceOption) {
+            const shortPrice = serviceOption.dataset.ltrShortPrice;
+            const fullPrice = serviceOption.dataset.ltrPrice;
+
+            hiddenInput.setAttribute("data-short-price", shortPrice);
+            hiddenInput.setAttribute("data-full-price", fullPrice);
+
+            document.getElementById(
+              "price-3days"
+            ).textContent = `$${shortPrice}`;
+            document.getElementById(
+              "price-30days"
+            ).textContent = `$${fullPrice}`;
+          }
+
+          showAlert(
+            "Service and details pre-selected for reorder. Please choose duration and submit.",
+            "info"
+          );
+
+          // Scroll to the order form
+          document
+            .querySelector(".card")
+            .scrollIntoView({ behavior: "smooth" });
+        }
+      }
+
+      function copyToClipboard(text) {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            showAlert("Number copied to clipboard!", "success");
+          })
+          .catch(() => {
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+            showAlert("Number copied to clipboard!", "success");
+          });
+      }
+
+      // New action functions for the updated buttons
+      async function toggleAction(rentalId, actionType) {
+        try {
+          const result = await fetch(
+            `/user/api/rentals/${rentalId}/toggle-action`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ action: actionType }),
+            }
+          );
+
+          const data = await result.json();
+
+          if (data.success) {
+            showAlert(`${actionType} toggled successfully!`, "success");
+
+            // Update the button state
+            const button = document.querySelector(
+              `[onclick="toggleAction('${rentalId}', '${actionType}')"]`
+            );
+            if (button) {
+              button.classList.toggle("active");
+            }
+
+            // Optionally reload rentals to ensure consistency
+            loadRentals();
+          } else {
+            showAlert(
+              data.message || `Failed to toggle ${actionType}`,
+              "error"
+            );
+          }
+        } catch (error) {
+          console.error("Error toggling action:", error);
+          showAlert(`Failed to toggle ${actionType}`, "error");
+        }
+      }
+
+      async function renewOrder(rentalId) {
+        if (!confirm("Are you sure you want to renew this order?")) return;
+
+        try {
+          showAlert("Renewing order...", "info");
+
+          const result = await fetch(`/user/api/rentals/${rentalId}/renew`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = await result.json();
+
+          if (data.success) {
+            showAlert("Order renewed successfully!", "success");
+            loadRentals();
+            refreshBalance();
+          } else {
+            showAlert(data.message || "Failed to renew order", "error");
+          }
+        } catch (error) {
+          console.error("Error renewing order:", error);
+          showAlert("Failed to renew order", "error");
+        }
+      }
+
+      // Close dropdown when clicking outside
+      document.addEventListener("click", (event) => {
+        const clickedElement = event.target;
+        const isDropdownClick = clickedElement.closest(".searchable-dropdown");
+
+        if (!isDropdownClick) {
+          // Close all dropdowns
+          document.querySelectorAll(".dropdown-menu.show").forEach((menu) => {
+            menu.classList.remove("show");
+            menu.parentElement
+              .querySelector(".dropdown-toggle")
+              .classList.remove("active");
+          });
+        }
+
+        // Also close user dropdown
+        if (!clickedElement.closest("#userDropdown")) {
+          dropdownMenu.classList.remove("active");
+        }
+      });
+
+      // Initialize on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("Page loaded, initializing...");
+        
+        // Clear any existing intervals first (in case of reload)
+        if (window.balanceRefreshInterval) clearInterval(window.balanceRefreshInterval);
+        if (window.rentalsRefreshInterval) clearInterval(window.rentalsRefreshInterval);
+        
+        refreshBalance();
+
+        // Load rentals with a small delay to ensure DOM is fully ready
+        setTimeout(() => {
+          loadRentals();
+        }, 500);
+
+        loadServices(); // Load services dynamically
+        setupLogoutHandler(); // Setup logout button handler
+
+        // Add keyboard support for dropdowns
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") {
+            // Close all dropdowns on Escape key
+            document.querySelectorAll(".dropdown-menu.show").forEach((menu) => {
+              menu.classList.remove("show");
+              menu.parentElement
+                .querySelector(".dropdown-toggle")
+                .classList.remove("active");
+            });
+          }
+        });
+
+        // Set up periodic balance refresh (every 30 seconds) - with safety check
+        if (!window.balanceRefreshInterval) {
+          window.balanceRefreshInterval = setInterval(refreshBalance, 30000);
+        }
+
+        // Set up periodic rentals refresh (every 2 minutes) - with safety check
+        if (!window.rentalsRefreshInterval) {
+          window.rentalsRefreshInterval = setInterval(loadRentals, 120000);
+        }
+      });
+
+      // Load services from backend
+      async function loadServices() {
+        const serviceOptions = document.getElementById(
+          "rental-service-options"
+        );
+
+        try {
+          serviceOptions.innerHTML =
+            '<div class="option"><span class="option-text">Loading services...</span></div>';
+
+          const response = await fetch("/user/api/services");
+          const data = await response.json();
+
+          if (data.success && data.services && data.services.length > 0) {
+            updateServiceOptions(data.services);
+          } else {
+            serviceOptions.innerHTML =
+              '<div class="option"><span class="option-text">No services available</span></div>';
+          }
+        } catch (error) {
+          console.error("Error loading services:", error);
+          serviceOptions.innerHTML =
+            '<div class="option"><span class="option-text">Failed to load services</span></div>';
+        }
+      }
+
+      // Update service options
+      function updateServiceOptions(services) {
+        const serviceOptions = document.getElementById(
+          "rental-service-options"
+        );
+        serviceOptions.innerHTML = "";
+
+        services.forEach((service) => {
+          const option = document.createElement("div");
+          option.className = "option";
+          option.dataset.value = service.name; // Use name as value
+          option.dataset.name = service.name;
+          option.dataset.ltrShortPrice =
+            service.ltr_short_price || service.price;
+          option.dataset.ltrPrice = service.ltr_price || service.price;
+          option.onclick = () => selectRentalService(option);
+
+          option.innerHTML = `
+            <span class="option-text">${service.name}</span>
+            <span class="option-price">$${
+              service.ltr_short_price || service.price
+            }</span>
+          `;
+
+          serviceOptions.appendChild(option);
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,4191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeByPass - Temporary Number (S1)</title>
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Custom CSS -->
+    <style>
+      /* Color System */
+      :root {
+        /* Color System */
+        --primary: #2563eb;
+        --primary-light: #3b82f6;
+        --primary-dark: #1d4ed8;
+        --primary-transparent: rgba(37, 99, 235, 0.1);
+        --secondary: #0f172a;
+        --accent: #10b981;
+        --accent-dark: #059669;
+        --purple: #8b5cf6;
+        --pink: #ec4899;
+        --orange: #f97316;
+        --teal: #14b8a6;
+        --white: #ffffff;
+        --light: #f9fafb;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --success: #10b981;
+        --info: #3b82f6;
+
+        /* Layout */
+        --sidebar-width: 260px;
+        --sidebar-collapsed-width: 70px;
+        --header-height: 64px;
+
+        /* Border Radius */
+        --border-radius-sm: 4px;
+        --border-radius: 6px;
+        --border-radius-md: 8px;
+        --border-radius-lg: 12px;
+        --border-radius-xl: 16px;
+
+        /* Shadows */
+        --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+        --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.1),
+          0 1px 2px rgba(16, 24, 40, 0.06);
+        --shadow: 0 4px 6px -1px rgba(16, 24, 40, 0.1),
+          0 2px 4px -2px rgba(16, 24, 40, 0.1);
+        --shadow-md: 0 10px 15px -3px rgba(16, 24, 40, 0.1),
+          0 4px 6px -4px rgba(16, 24, 40, 0.1);
+        --shadow-lg: 0 20px 25px -5px rgba(16, 24, 40, 0.1),
+          0 8px 10px -6px rgba(16, 24, 40, 0.1);
+        --shadow-xl: 0 25px 50px -12px rgba(16, 24, 40, 0.25);
+
+        /* Transitions */
+        --transition-fast: all 0.2s ease;
+        --transition: all 0.3s ease;
+        --transition-slow: all 0.5s ease;
+      }
+
+      /* Base Styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        font-size: 16px;
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--gray-50);
+        color: var(--gray-800);
+        line-height: 1.6;
+        overflow-x: hidden;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        width: 100%;
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+        transition: var(--transition);
+      }
+
+      ul {
+        list-style: none;
+      }
+
+      button {
+        cursor: pointer;
+        font-family: inherit;
+        border: none;
+        background: none;
+      }
+
+      /* Typography */
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-weight: 600;
+        line-height: 1.2;
+        color: var(--secondary);
+        margin-bottom: 0.5rem;
+      }
+
+      h1 {
+        font-size: 1.75rem;
+      }
+      h2 {
+        font-size: 1.5rem;
+      }
+      h3 {
+        font-size: 1.25rem;
+      }
+      h4 {
+        font-size: 1.125rem;
+      }
+      h5 {
+        font-size: 1rem;
+      }
+      h6 {
+        font-size: 0.875rem;
+      }
+
+      p {
+        margin-bottom: 1rem;
+        color: var(--gray-600);
+      }
+
+      /* Layout */
+      .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+        position: relative;
+        width: 100%;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: var(--sidebar-width);
+        background: linear-gradient(180deg, var(--secondary) 0%, #1e3a8a 100%);
+        color: var(--white);
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 100;
+        transition: var(--transition);
+        overflow-y: auto;
+        overflow-x: hidden;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sidebar::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .sidebar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+      }
+
+      .sidebar-header {
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        height: var(--header-height);
+      }
+
+      /* Update logo styles for better visibility control */
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: var(--white);
+        width: 100%;
+      }
+
+      .logo-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background-color: transparent;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        flex-shrink: 0;
+      }
+
+      .logo-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .logo-text {
+        transition: var(--transition);
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: 180px; /* Limit the width to prevent overflow */
+      }
+
+      .logo-text img {
+        height: 24px;
+        width: auto;
+        transition: var(--transition);
+      }
+
+      /* Add a logo container class for better control */
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      /* Adjust logo visibility based on sidebar state */
+      .sidebar-collapsed .logo-text {
+        opacity: 0;
+        visibility: hidden;
+        width: 0;
+        overflow: hidden;
+      }
+
+      .sidebar-collapsed .logo-icon {
+        margin: 0 auto;
+        opacity: 1;
+        visibility: visible;
+        display: flex;
+      }
+
+      /* Hide icon when sidebar is expanded */
+      .sidebar:not(.sidebar-collapsed) .logo-icon {
+        display: none;
+      }
+
+      /* Update the sidebar toggle container positioning to be at the border between sidebar and main content */
+      .sidebar-toggle-container {
+        position: absolute;
+        top: 20px;
+        left: var(--sidebar-width);
+        transform: translateX(-50%);
+        z-index: 101;
+      }
+
+      .sidebar-collapsed + .sidebar-toggle-container {
+        left: var(--sidebar-collapsed-width);
+      }
+
+      /* Improved sidebar toggle button design */
+      .sidebar-toggle {
+        width: 32px;
+        height: 32px;
+        background: var(--white);
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .sidebar-toggle:hover {
+        background: var(--primary-light);
+        color: var(--white);
+        transform: scale(1.1);
+      }
+
+      .sidebar-toggle::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.1),
+          rgba(255, 255, 255, 0)
+        );
+        border-radius: 50%;
+      }
+
+      .sidebar-toggle i {
+        font-size: 1rem;
+        transition: var(--transition);
+      }
+
+      .sidebar-toggle .toggle-icon-open {
+        display: block;
+      }
+
+      .sidebar-toggle .toggle-icon-close {
+        display: none;
+      }
+
+      .sidebar-collapsed .sidebar-toggle .toggle-icon-open {
+        display: none;
+      }
+
+      .sidebar-collapsed .sidebar-toggle .toggle-icon-close {
+        display: block;
+      }
+
+      .sidebar-menu {
+        padding: 1.25rem 0;
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .sidebar-menu::-webkit-scrollbar {
+        width: 3px;
+      }
+
+      .sidebar-menu::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .sidebar-menu::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+      }
+
+      .menu-category {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--gray-400);
+        padding: 0 1.5rem;
+        margin: 1.5rem 0 0.75rem;
+        transition: var(--transition);
+      }
+
+      .menu-item {
+        position: relative;
+      }
+
+      .menu-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.625rem 1.5rem;
+        color: var(--gray-300);
+        font-weight: 500;
+        transition: var(--transition);
+        position: relative;
+        border-left: 3px solid transparent;
+      }
+
+      .menu-link:hover,
+      .menu-link.active {
+        color: var(--white);
+        background: rgba(255, 255, 255, 0.1);
+        border-left-color: var(--primary-light);
+      }
+
+      .menu-icon {
+        font-size: 1.125rem;
+        min-width: 1.125rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .menu-text {
+        transition: var(--transition);
+        white-space: nowrap;
+      }
+
+      .menu-badge {
+        margin-left: auto;
+        background: var(--primary-light);
+        color: var(--white);
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.125rem 0.5rem;
+        border-radius: 50px;
+        transition: var(--transition);
+      }
+
+      /* Collapsed Sidebar */
+      .sidebar-collapsed {
+        width: var(--sidebar-collapsed-width);
+      }
+
+      .sidebar-collapsed .logo-text,
+      .sidebar-collapsed .menu-text,
+      .sidebar-collapsed .menu-badge,
+      .sidebar-collapsed .menu-category {
+        opacity: 0;
+        visibility: hidden;
+        width: 0;
+      }
+
+      .sidebar-collapsed .menu-link {
+        justify-content: center;
+        padding: 0.625rem;
+      }
+
+      .sidebar-collapsed .menu-icon {
+        margin-right: 0;
+      }
+
+      /* Fix for deposit wallet icon alignment when sidebar is collapsed */
+      .sidebar-collapsed .menu-item .menu-link {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .sidebar-collapsed .menu-item .menu-icon {
+        position: relative;
+        margin: 0;
+      }
+
+      /* Main Content */
+      .main-content {
+        flex: 1;
+        margin-left: var(--sidebar-width);
+        transition: var(--transition);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        width: calc(100% - var(--sidebar-width));
+      }
+
+      .sidebar-collapsed + .main-content {
+        margin-left: var(--sidebar-collapsed-width);
+        width: calc(100% - var(--sidebar-collapsed-width));
+      }
+
+      /* Header */
+      .header {
+        height: var(--header-height);
+        background: var(--white);
+        box-shadow: var(--shadow-sm);
+        padding: 0 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 99;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .mobile-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--gray-700);
+        font-size: 1.25rem;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      }
+
+      .mobile-toggle:hover {
+        background: var(--gray-100);
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+      }
+
+      .balance-display {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--primary-transparent);
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .balance-display:hover {
+        background: rgba(37, 99, 235, 0.15);
+      }
+
+      .balance-icon {
+        color: var(--primary);
+        font-size: 1rem;
+      }
+
+      .balance-amount {
+        font-weight: 600;
+        color: var(--primary);
+      }
+
+      .add-funds-btn {
+        background: var(--primary);
+        color: var(--white);
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        transition: var(--transition);
+      }
+
+      .add-funds-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+      }
+
+      .user-dropdown {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        position: relative;
+      }
+
+      .user-dropdown:hover {
+        background: var(--gray-100);
+      }
+
+      .header-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--primary-transparent);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1rem;
+      }
+
+      .header-user-info {
+        display: none;
+      }
+
+      .header-user-name {
+        font-weight: 600;
+        color: var(--secondary);
+        font-size: 0.875rem;
+      }
+
+      .header-user-role {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+      }
+
+      /* Content Area */
+      .content {
+        padding: 1.5rem;
+        flex: 1;
+      }
+
+      .section-header {
+        margin-bottom: 1.5rem;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--secondary);
+        margin-bottom: 0.375rem;
+      }
+
+      .section-subtitle {
+        color: var(--gray-500);
+        font-size: 0.9375rem;
+      }
+
+      /* Stats Cards */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .stat-card {
+        background: var(--white);
+        border-radius: var(--border-radius-md);
+        padding: 1.25rem;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        border: 1px solid var(--gray-100);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--primary-light),
+          transparent
+        );
+        opacity: 0;
+        transition: var(--transition);
+      }
+
+      .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-light);
+      }
+
+      .stat-card:hover::after {
+        opacity: 1;
+      }
+
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+      }
+
+      .stat-icon-primary {
+        background: var(--primary-transparent);
+        color: var(--primary);
+      }
+
+      .stat-icon-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+      }
+
+      .stat-icon-info {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--info);
+      }
+
+      .stat-icon-warning {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+      }
+
+      .stat-content {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--secondary);
+        margin-bottom: 0.25rem;
+      }
+
+      .stat-label {
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* Cards */
+      .card-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .card {
+        background: var(--white);
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-sm);
+        overflow: visible; /* Changed from hidden to visible to allow dropdowns */
+        transition: var(--transition);
+        border: 1px solid var(--gray-100);
+      }
+
+      /* Special handling for card content to maintain layout while allowing dropdowns */
+      .card-body {
+        padding: 1.25rem;
+        overflow: visible; /* Ensure dropdowns can extend outside card body */
+      }
+
+      /* For any images or content that needs clipping, use this class */
+      .card-content-clipped {
+        overflow: hidden;
+        border-radius: var(--border-radius-md);
+      }
+
+      .card:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-light);
+      }
+
+      .card-header {
+        padding: 1.25rem;
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(to right, var(--white), var(--gray-50));
+      }
+
+      .card-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--secondary);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .card-title i {
+        color: var(--primary);
+        font-size: 0.9375rem;
+      }
+
+      .card-body {
+        padding: 1.25rem;
+        overflow: visible; /* Ensure dropdowns can extend outside card body */
+      }
+
+      /* News Cards */
+      .news-item {
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+      }
+
+      .news-item:hover {
+        background-color: var(--gray-50);
+      }
+
+      .news-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .news-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .news-title {
+        font-weight: 600;
+        color: var(--secondary);
+        margin: 0;
+        font-size: 0.9375rem;
+      }
+
+      .news-date {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+      }
+
+      .news-content {
+        color: var(--gray-600);
+        margin-bottom: 0;
+        word-break: break-word;
+        font-size: 0.875rem;
+      }
+
+      /* Quick Actions */
+      .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+      }
+
+      .quick-action {
+        background: var(--white);
+        border: 1px solid var(--gray-100);
+        border-radius: var(--border-radius);
+        padding: 1rem 0.75rem;
+        text-align: center;
+        transition: var(--transition);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .quick-action::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          var(--primary-transparent) 0%,
+          transparent 70%
+        );
+        opacity: 0;
+        transition: var(--transition);
+        z-index: 0;
+      }
+
+      .quick-action:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-light);
+      }
+
+      .quick-action:hover::before {
+        opacity: 1;
+      }
+
+      .quick-action-icon {
+        font-size: 1.5rem;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .quick-action-label {
+        font-weight: 500;
+        color: var(--secondary);
+        margin: 0;
+        position: relative;
+        z-index: 1;
+        font-size: 0.875rem;
+      }
+
+      /* Forms */
+      .form-group {
+        margin-bottom: 1.25rem;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 0.375rem;
+        font-weight: 500;
+        color: var(--secondary);
+        font-size: 0.875rem;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.875rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        background-color: var(--white);
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-transparent);
+      }
+
+      .form-select {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.875rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        background-color: var(--white);
+        transition: var(--transition);
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+      }
+
+      .form-select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-transparent);
+      }
+
+      .input-group {
+        display: flex;
+        align-items: center;
+      }
+
+      .input-group .form-control {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        flex: 1;
+      }
+
+      .input-group-text {
+        padding: 0.625rem 0.875rem;
+        background: var(--gray-100);
+        border: 1px solid var(--gray-300);
+        border-left: none;
+        border-top-right-radius: var(--border-radius);
+        border-bottom-right-radius: var(--border-radius);
+        color: var(--gray-600);
+        font-size: 0.875rem;
+      }
+
+      /* Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.375rem;
+        padding: 0.625rem 1.25rem;
+        font-weight: 500;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        cursor: pointer;
+        border: none;
+        font-size: 0.875rem;
+        touch-action: manipulation;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: var(--white);
+      }
+
+      .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+      }
+
+      .btn-outline:hover {
+        background: var(--primary);
+        color: var(--white);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      }
+
+      .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.8125rem;
+      }
+
+      /* Tables */
+      .table-container {
+        overflow-x: auto;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-sm);
+        background: var(--white);
+        margin-bottom: 1.5rem;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 600px;
+      }
+
+      .table th {
+        background: var(--gray-50);
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--secondary);
+        border-bottom: 1px solid var(--gray-200);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        font-size: 0.875rem;
+      }
+
+      .table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--gray-100);
+        color: var(--gray-700);
+        word-break: break-word;
+        font-size: 0.875rem;
+      }
+
+      .table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .table tr:nth-child(even) {
+        background: var(--gray-50);
+      }
+
+      .table-empty {
+        text-align: center;
+        padding: 2rem;
+        color: var(--gray-500);
+      }
+
+      /* Responsive table for mobile */
+      @media (max-width: 767px) {
+        .table-responsive-card {
+          border: 0;
+          box-shadow: none;
+        }
+
+        .table-responsive-card table,
+        .table-responsive-card thead,
+        .table-responsive-card tbody,
+        .table-responsive-card th,
+        .table-responsive-card td,
+        .table-responsive-card tr {
+          display: block;
+        }
+
+        .table-responsive-card thead tr {
+          position: absolute;
+          top: -9999px;
+          left: -9999px;
+        }
+
+        .table-responsive-card tr {
+          border: 1px solid var(--gray-200);
+          border-radius: var(--border-radius);
+          margin-bottom: 0.75rem;
+          background: var(--white);
+          box-shadow: var(--shadow-sm);
+        }
+
+        .table-responsive-card td {
+          border: none;
+          border-bottom: 1px solid var(--gray-100);
+          position: relative;
+          padding-left: 50%;
+          text-align: right;
+          min-height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+        }
+
+        .table-responsive-card td:last-child {
+          border-bottom: 0;
+        }
+
+        .table-responsive-card td:before {
+          position: absolute;
+          top: 0.75rem;
+          left: 1rem;
+          width: 45%;
+          padding-right: 10px;
+          white-space: nowrap;
+          text-align: left;
+          font-weight: 600;
+          content: attr(data-label);
+        }
+      }
+
+      /* Search */
+      .search-container {
+        margin-bottom: 1rem;
+        position: relative;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 0.625rem 1rem 0.625rem 2.5rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        background-color: var(--white);
+        transition: var(--transition);
+        font-size: 0.875rem;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-transparent);
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 0.875rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-500);
+        pointer-events: none;
+      }
+
+      /* Badges */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.25rem 0.625rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: 50px;
+        text-transform: capitalize;
+      }
+
+      .badge-primary {
+        background-color: var(--primary-transparent);
+        color: var(--primary);
+      }
+
+      .badge-success {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+      }
+
+      .badge-warning {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+      }
+
+      .badge-danger {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+      }
+
+      /* API Key */
+      .api-key-container {
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius);
+        padding: 0.875rem;
+        margin-bottom: 1.25rem;
+        font-family: monospace;
+        position: relative;
+        overflow-x: auto;
+      }
+
+      .api-key {
+        overflow-x: auto;
+        white-space: nowrap;
+        color: var(--gray-800);
+        padding-right: 5rem;
+        font-size: 0.875rem;
+      }
+
+      .copy-btn {
+        position: absolute;
+        right: 0.875rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--gray-200);
+        border: none;
+        color: var(--gray-700);
+        padding: 0.375rem 0.75rem;
+        border-radius: var(--border-radius);
+        font-size: 0.8125rem;
+        transition: var(--transition);
+      }
+
+      .copy-btn:hover {
+        background: var(--gray-300);
+      }
+
+      /* Row layout for forms */
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -0.625rem;
+      }
+
+      .row .form-group {
+        flex: 1;
+        min-width: 200px;
+        padding: 0 0.625rem;
+      }
+
+      /* User Dropdown Menu */
+      .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        right: 0;
+        background: var(--white);
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-lg);
+        width: 220px;
+        z-index: 1000;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.2s ease;
+      }
+
+      .dropdown-menu.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .dropdown-header {
+        padding: 1rem;
+        border-bottom: 1px solid var(--gray-100);
+      }
+
+      .dropdown-user-info {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .dropdown-user-name {
+        font-weight: 600;
+        color: var(--secondary);
+        margin-bottom: 0.25rem;
+        font-size: 0.9375rem;
+      }
+
+      .dropdown-user-email {
+        font-size: 0.8125rem;
+        color: var(--gray-500);
+      }
+
+      .dropdown-body {
+        padding: 0.5rem 0;
+      }
+
+      .dropdown-item {
+        padding: 0.625rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--gray-700);
+        transition: var(--transition);
+        cursor: pointer;
+        font-size: 0.875rem;
+      }
+
+      .dropdown-item:hover {
+        background: var(--gray-50);
+        color: var(--primary);
+      }
+
+      .dropdown-item i {
+        font-size: 1rem;
+        color: var(--gray-500);
+      }
+
+      .dropdown-item:hover i {
+        color: var(--primary);
+      }
+
+      .dropdown-divider {
+        height: 1px;
+        background: var(--gray-100);
+        margin: 0.5rem 0;
+      }
+
+      /* History Tabs */
+      .history-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+        padding-bottom: 0.75rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .history-tab {
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius);
+        padding: 0.5rem 1rem;
+        text-align: center;
+        transition: var(--transition);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        white-space: nowrap;
+      }
+
+      .history-tab i {
+        font-size: 1rem;
+      }
+
+      .history-tab:hover,
+      .history-tab.active {
+        background: var(--primary-transparent);
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      /* History Filters */
+      .history-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .date-range-filter {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+      }
+
+      .date-range-input {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .date-range-input label {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        margin-bottom: 0.25rem;
+      }
+
+      /* History Stats */
+      .history-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .history-stat {
+        background: var(--white);
+        border-radius: var(--border-radius-md);
+        padding: 1rem;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        border: 1px solid var(--gray-100);
+        text-align: center;
+      }
+
+      .history-stat-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--secondary);
+        margin-bottom: 0.25rem;
+      }
+
+      .history-stat-label {
+        color: var(--gray-500);
+        font-size: 0.875rem;
+      }
+
+      /* History Table */
+      .history-table th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        font-size: 0.875rem;
+        text-transform: capitalize;
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: var(--gray-500);
+      }
+
+      .empty-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+        color: var(--gray-400);
+      }
+
+      /* Pagination */
+      .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--gray-50);
+        border-top: 1px solid var(--gray-200);
+        border-bottom-left-radius: var(--border-radius-md);
+        border-bottom-right-radius: var(--border-radius-md);
+      }
+
+      .pagination-info {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+      }
+
+      .pagination {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .pagination-btn {
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius);
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        transition: var(--transition);
+        cursor: pointer;
+      }
+
+      .pagination-btn:hover,
+      .pagination-btn.active {
+        background: var(--primary-transparent);
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      .pagination-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Responsive */
+      @media (min-width: 992px) {
+        .header-user-info {
+          display: block;
+        }
+
+        .mobile-toggle {
+          display: none;
+        }
+      }
+
+      @media (max-width: 1400px) {
+        .stats-grid {
+          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        }
+      }
+
+      @media (max-width: 1200px) {
+        .card-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+      }
+
+      @media (max-width: 992px) {
+        .sidebar {
+          transform: translateX(-100%);
+          box-shadow: none;
+          z-index: 1001;
+        }
+
+        .sidebar.active {
+          transform: translateX(0);
+          box-shadow: var(--shadow-lg);
+        }
+
+        .main-content {
+          margin-left: 0 !important;
+          width: 100% !important;
+        }
+
+        .mobile-toggle {
+          display: flex;
+        }
+
+        .overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 1000;
+          opacity: 0;
+          visibility: hidden;
+          transition: var(--transition);
+        }
+
+        .overlay.active {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        .sidebar-toggle-container {
+          display: none;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        }
+
+        .header-right {
+          gap: 0.75rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          padding: 0 1rem;
+        }
+
+        .content {
+          padding: 1.25rem 1rem;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
+        }
+
+        .quick-actions {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .row {
+          flex-direction: column;
+        }
+
+        .row .form-group {
+          width: 100%;
+        }
+
+        /* Responsive filters */
+        .filters-container {
+          flex-direction: column;
+          gap: 1rem;
+          padding: 1rem;
+        }
+
+        .filter-group {
+          min-width: unset;
+          width: 100%;
+        }
+
+        .filters-container .btn {
+          margin-top: 0;
+          width: 100%;
+        }
+
+        .card-header {
+          padding: 1rem;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .card-body {
+          padding: 1rem;
+        }
+
+        .balance-display {
+          padding: 0.375rem 0.625rem;
+        }
+
+        .add-funds-btn {
+          padding: 0.375rem 0.625rem;
+        }
+
+        .add-funds-btn span {
+          display: none;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .header-right {
+          gap: 0.5rem;
+        }
+
+        .balance-display {
+          padding: 0.375rem 0.5rem;
+        }
+
+        .add-funds-btn {
+          padding: 0.375rem 0.5rem;
+        }
+
+        .quick-actions {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .form-row {
+          flex-direction: column;
+        }
+
+        .form-row .form-group {
+          width: 100%;
+          padding: 0;
+        }
+
+        .btn {
+          width: 100%;
+        }
+
+        .content {
+          padding: 1rem 0.75rem;
+        }
+
+        .section-title {
+          font-size: 1.375rem;
+        }
+
+        .header-action,
+        .theme-toggle {
+          width: 32px;
+          height: 32px;
+        }
+
+        .header-avatar {
+          width: 32px;
+          height: 32px;
+        }
+
+        .dropdown-menu {
+          width: 200px;
+          right: -70px;
+        }
+
+        .dropdown-menu::before {
+          content: "";
+          position: absolute;
+          top: -8px;
+          right: 80px;
+          width: 16px;
+          height: 16px;
+          background: var(--white);
+          transform: rotate(45deg);
+          border-top: 1px solid var(--gray-200);
+          border-left: 1px solid var(--gray-200);
+        }
+      }
+
+      /* Touch optimizations */
+      @media (pointer: coarse) {
+        .menu-link,
+        .dropdown-item,
+        .btn,
+        .quick-action,
+        .header-action,
+        .user-dropdown {
+          min-height: 44px;
+        }
+
+        input,
+        select,
+        button {
+          min-height: 44px;
+        }
+
+        .form-control,
+        .form-select {
+          font-size: 16px; /* Prevents iOS zoom on focus */
+        }
+      }
+
+      /* History Tab Content */
+      .history-tab-content {
+        display: none;
+      }
+
+      .history-tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Section */
+      .section {
+        display: none;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .section.active {
+        display: block;
+      }
+
+      .api-alert {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 4px;
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        max-width: 400px;
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .api-alert.alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .api-alert.alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+        }
+        to {
+          transform: translateX(0);
+        }
+      }
+
+      /* Searchable Dropdown Styles */
+      .search-dropdown {
+        position: relative;
+        width: 100%;
+      }
+
+      .search-dropdown-input {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.625rem 1rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        background: var(--white);
+        cursor: pointer;
+        transition: var(--transition);
+        height: 48px;
+        font-size: 0.875rem;
+        color: var(--gray-700);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+
+      .search-dropdown-input:hover {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-transparent);
+      }
+
+      .search-dropdown-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-transparent);
+        outline: none;
+      }
+
+      .search-dropdown-input .placeholder {
+        color: var(--gray-500);
+        flex: 1;
+        font-size: 0.875rem;
+        user-select: none;
+      }
+
+      .search-dropdown-input .selected-value {
+        color: var(--gray-800);
+        flex: 1;
+        font-weight: 500;
+        font-size: 0.875rem;
+        user-select: none;
+      }
+
+      .search-dropdown-input i {
+        color: var(--gray-400);
+        transition: var(--transition);
+        font-size: 0.875rem;
+        margin-left: 0.5rem;
+        flex-shrink: 0;
+      }
+
+      .search-dropdown.active .search-dropdown-input {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-transparent);
+      }
+
+      .search-dropdown.active .search-dropdown-input i {
+        transform: rotate(180deg);
+        color: var(--primary);
+      }
+
+      .search-dropdown-menu {
+        position: absolute;
+        top: calc(100% + 2px);
+        left: 0;
+        right: 0;
+        background: var(--white);
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+          0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        z-index: 9999; /* Increased z-index to ensure dropdown appears above all elements */
+        max-height: 320px;
+        overflow: hidden;
+        display: none;
+        animation: dropdownFadeIn 0.15s ease-out;
+      }
+
+      .search-dropdown.active .search-dropdown-menu {
+        display: block;
+      }
+
+      @keyframes dropdownFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .search-box {
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--gray-200);
+        position: relative;
+        background: var(--gray-50);
+      }
+
+      .search-box .search-input {
+        width: 100%;
+        padding: 0.5rem 2.25rem 0.5rem 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius-sm);
+        font-size: 0.875rem;
+        outline: none;
+        transition: var(--transition);
+        background: var(--white);
+        height: 36px;
+      }
+
+      .search-box .search-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px var(--primary-transparent);
+      }
+
+      .search-box .search-input::placeholder {
+        color: var(--gray-400);
+        font-size: 0.875rem;
+      }
+
+      .search-box .search-icon {
+        position: absolute;
+        right: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+        pointer-events: none;
+        font-size: 0.875rem;
+        z-index: 1;
+      }
+
+      .dropdown-options {
+        max-height: 240px;
+        overflow-y: auto;
+        background: var(--white);
+      }
+
+      .dropdown-options::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .dropdown-options::-webkit-scrollbar-track {
+        background: var(--gray-100);
+      }
+
+      .dropdown-options::-webkit-scrollbar-thumb {
+        background: var(--gray-300);
+        border-radius: 3px;
+      }
+
+      .dropdown-options::-webkit-scrollbar-thumb:hover {
+        background: var(--gray-400);
+      }
+
+      .dropdown-option {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 52px;
+      }
+
+      .dropdown-option:last-child {
+        border-bottom: none;
+      }
+
+      .dropdown-option:hover {
+        background-color: var(--gray-50);
+      }
+
+      .dropdown-option.selected {
+        background-color: var(--primary-transparent);
+        color: var(--primary);
+        font-weight: 500;
+        border-left: 3px solid var(--primary);
+      }
+
+      .dropdown-option-name {
+        font-weight: 500;
+        color: var(--gray-800);
+        font-size: 0.875rem;
+        line-height: 1.4;
+      }
+
+      .dropdown-option-price {
+        font-size: 0.875rem;
+        color: var(--success);
+        font-weight: 600;
+        background: var(--gray-50);
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--border-radius-sm);
+        border: 1px solid var(--gray-200);
+      }
+
+      .dropdown-option.selected .dropdown-option-name {
+        color: var(--primary);
+      }
+
+      .dropdown-option.selected .dropdown-option-price {
+        color: var(--primary);
+        background: var(--primary-transparent);
+        border-color: var(--primary);
+      }
+
+      .dropdown-option:hover .dropdown-option-price {
+        background: var(--white);
+      }
+
+      /* Empty state for dropdown */
+      .dropdown-empty {
+        padding: 2rem 1rem;
+        text-align: center;
+        color: var(--gray-500);
+        font-size: 0.875rem;
+      }
+
+      .dropdown-empty i {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--gray-400);
+      }
+
+      /* Action Buttons Styles */
+      .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .action-btn {
+        padding: 0.375rem 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius-sm);
+        background: var(--white);
+        color: var(--gray-600);
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .action-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      .action-btn.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: var(--white);
+      }
+
+      .action-btn i {
+        font-size: 0.75rem;
+      }
+
+      /* Message column wider */
+      .table th:nth-child(7),
+      .table td:nth-child(7) {
+        min-width: 200px;
+        max-width: 400px;
+        /* width: 30%; */
+        word-wrap: break-word;
+        white-space: normal;
+      }
+
+      /* Enhanced Filters */
+      .filters-container {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1.25rem;
+        background: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray-200);
+        flex-wrap: wrap;
+        align-items: end; /* Align items to bottom for proper baseline alignment */
+      }
+
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        min-width: 120px;
+      }
+
+      .filter-group label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--gray-700);
+        margin-bottom: 0;
+      }
+
+      .filter-select,
+      .filter-input {
+        padding: 0.625rem 0.875rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius);
+        background: var(--white);
+        font-size: 0.875rem;
+        color: var(--gray-700);
+        transition: var(--transition);
+        height: 42px; /* Fixed height for consistency */
+      }
+
+      .filter-select:focus,
+      .filter-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-transparent);
+      }
+
+      .filter-select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+        padding-right: 2.5rem;
+      }
+
+      .filters-container .btn {
+        margin-top: 1.75rem; /* Offset to align with inputs */
+        height: 42px; /* Match input height */
+        align-self: end;
+      }
+
+      .filter-group label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--gray-700);
+      }
+
+      .filter-select,
+      .filter-input {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--border-radius-sm);
+        font-size: 0.875rem;
+        background: var(--white);
+        transition: var(--transition);
+      }
+
+      .filter-select:focus,
+      .filter-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px var(--primary-transparent);
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-content {
+        background-color: #fff;
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 5px;
+        width: 400px;
+        max-width: 90%;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 15px;
+        gap: 10px;
+      }
+
+      .btn-outline-primary {
+        background: transparent;
+        border: 1px solid #3563e9;
+        color: #3563e9;
+      }
+
+      .btn-outline-primary:hover {
+        background: #3563e9;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <a href="/user/index" class="logo">
+            <div class="logo-container">
+              <div class="logo-icon">
+                <img
+                  src="/assets/images/codebypass-logo/codebypass-icon-white-bg.png"
+                  alt="CodeByPass Icon"
+                />
+              </div>
+              <img
+                src="  /assets/images/codebypass-logo/codebypass-logo-white-text-bg.png"
+                alt="CodeByPass"
+                class="logo-text"
+              />
+            </div>
+          </a>
+        </div>
+
+        <div class="sidebar-menu">
+          <ul>
+            <li class="menu-item">
+              <a href="/user/index" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-th-large"></i></span>
+                <span class="menu-text">Dashboard</span>
+              </a>
+            </li>
+
+            <div class="menu-category">Services</div>
+
+            <li class="menu-item">
+              <a href="/user/temporary-number-s1" class="menu-link active">
+                <span class="menu-icon"><i class="fas fa-mobile-alt"></i></span>
+                <span class="menu-text">Temporary Number (S1)</span>
+              </a>
+            </li>
+
+            <li class="menu-item">
+              <a href="/user/rental-number" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-phone"></i></span>
+                <span class="menu-text">Rental Number</span>
+              </a>
+            </li>
+
+            <div class="menu-category">Account</div>
+
+            <li class="menu-item">
+              <a href="/user/order-histories" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-history"></i></span>
+                <span class="menu-text">Order Histories</span>
+              </a>
+            </li>
+
+            <li class="menu-item">
+              <a href="/user/deposit" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-wallet"></i></span>
+                <span class="menu-text">Deposit</span>
+                <span class="menu-badge"
+                  >$<%= user ? (user.balance || '0.00') : '0.00' %></span
+                >
+              </a>
+            </li>
+
+            <li class="menu-item">
+              <a href="/user/tickets" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-ticket-alt"></i></span>
+                <span class="menu-text">Tickets</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Sidebar Toggle -->
+      <div class="sidebar-toggle-container">
+        <button class="sidebar-toggle" id="sidebarToggle">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+          <div class="header-left">
+            <button class="mobile-toggle" id="mobileToggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+
+          <div class="header-right">
+            <div class="balance-display">
+              <i class="fas fa-wallet balance-icon"></i>
+              <span class="balance-amount"
+                >$<%= user ? (user.balance || '0.00') : '0.00' %></span
+              >
+            </div>
+
+            <a href="/user/deposit" class="add-funds-btn">
+              <i class="fas fa-plus-circle"></i>
+              <span>Add Funds</span>
+            </a>
+
+            <div class="user-dropdown" id="userDropdown">
+              <div class="header-avatar">
+                <%= user ? user.username.charAt(0).toUpperCase() : 'U' %>
+              </div>
+              <div class="header-user-info">
+                <div class="header-user-name">
+                  <%= user ? user.username : 'User' %>
+                </div>
+                <div class="header-user-role">
+                  <%= user ? user.role : 'Member' %>
+                </div>
+              </div>
+              <i class="fas fa-chevron-down"></i>
+
+              <!-- Dropdown Menu -->
+              <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-header">
+                  <div class="dropdown-user-info">
+                    <div class="dropdown-user-name">
+                      <%= user ? user.username : 'User' %>
+                    </div>
+                    <div class="dropdown-user-email">
+                      <%= user ? user.email : 'user@example.com' %>
+                    </div>
+                  </div>
+                </div>
+                <div class="dropdown-body">
+                  <a href="/user/user-profile" class="dropdown-item">
+                    <i class="fas fa-user"></i>
+                    <span>My Profile</span>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <div class="dropdown-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help Center</span>
+                  </div>
+                  <div class="dropdown-divider"></div>
+                  <div class="dropdown-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Log Out</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="content">
+          <div class="section-header">
+            <h2 class="section-title">Temporary Number (S1)</h2>
+            <p class="section-subtitle">
+              Order temporary numbers for SMS verification.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-info-circle"></i> How it works?
+              </h3>
+            </div>
+            <div class="card-body">
+              <p>
+                To place an order for a temporary number, first, choose the
+                country and then select your preferred service. The price will
+                be displayed under the service menu selection. Click on "Order
+                Number," and you'll find the number and remaining time under
+                "Pending SMS." Wait for the SMS to arrive without refreshing the
+                page. Once the SMS is received, our user-friendly system will
+                automatically update your code.
+              </p>
+            </div>
+          </div>
+          <br />
+
+          <!-- Replace the Advanced Order section with this -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-mobile-alt"></i> Order Temporary Number
+              </h3>
+            </div>
+            <div class="card-body">
+              <form id="orderForm">
+                <div class="form-group">
+                  <h4>Configure Number</h4>
+                  <div class="row">
+                    <div class="form-group">
+                      <label for="s1-country" class="form-label">Country</label>
+                      <select class="form-select" id="s1-country">
+                        <option value="us" selected>United States</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="s1-service" class="form-label">Service</label>
+                      <div class="search-dropdown" id="serviceDropdown">
+                        <div
+                          class="search-dropdown-input"
+                          id="serviceInput"
+                          tabindex="0"
+                        >
+                          <span class="placeholder">Select Service ...</span>
+                          <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div
+                          class="search-dropdown-menu"
+                          id="serviceDropdownMenu"
+                        >
+                          <div class="search-box">
+                            <input
+                              type="text"
+                              id="serviceSearch"
+                              placeholder="Search services..."
+                              class="search-input"
+                            />
+                            <!-- <i class="fas fa-search search-icon"></i> -->
+                          </div>
+                          <div class="dropdown-options" id="serviceOptions">
+                            <!-- Options will be loaded dynamically -->
+                          </div>
+                        </div>
+                      </div>
+                      <input
+                        type="hidden"
+                        id="selectedService"
+                        name="service"
+                      />
+                      <input
+                        type="hidden"
+                        id="selectedServicePrice"
+                        name="servicePrice"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="s1-state" class="form-label">State</label>
+                      <select class="form-select" id="s1-state">
+                        <option value="random" selected>Random Location</option>
+                        <!-- States will be loaded dynamically -->
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Price display -->
+                  <!-- Add this modal for premium requests -->
+                  <div class="modal" id="premiumModal">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h3>Request Premium Number</h3>
+                        <button class="modal-close">&times;</button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="form-group">
+                          <label
+                            >Service: <span id="premiumServiceName"></span
+                          ></label>
+                        </div>
+                        <div class="form-group">
+                          <label for="premiumMarkup"
+                            >Markup Percentage (10-2000%)</label
+                          >
+                          <input
+                            type="number"
+                            id="premiumMarkup"
+                            min="10"
+                            max="2000"
+                            class="form-input"
+                            placeholder="Enter markup percentage"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label
+                            >Estimated Total Price: $<span
+                              id="premiumTotalPrice"
+                              >0.00</span
+                            ></label
+                          >
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-secondary modal-close">
+                          Cancel
+                        </button>
+                        <button class="btn btn-primary" id="confirmPremium">
+                          Submit Request
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Update the order button section -->
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary" id="orderBtn">
+                      <i class="fas fa-shopping-cart"></i> Order Number
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      id="premiumBtn"
+                    >
+                      <i class="fas fa-crown"></i> Request Premium
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <br />
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fas fa-sms"></i> SMS Details</h3>
+            </div>
+            <div class="card-body">
+              <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input
+                  type="text"
+                  class="search-input"
+                  placeholder="Search orders..."
+                />
+              </div>
+              <div class="filters-container">
+                <div class="filter-group">
+                  <label>Status</label>
+                  <select class="filter-select" id="statusFilter">
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                    <option value="failed">Failed</option>
+                    <option value="expired">Expired</option>
+                  </select>
+                </div>
+                <div class="filter-group">
+                  <label>Date From</label>
+                  <input type="date" class="filter-input" id="dateFromFilter" />
+                </div>
+                <div class="filter-group">
+                  <label>Date To</label>
+                  <input type="date" class="filter-input" id="dateToFilter" />
+                </div>
+                <button class="btn btn-outline" onclick="resetFilters()">
+                  Reset
+                </button>
+              </div>
+              <div class="table-container table-responsive-card">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Created at</th>
+                      <th>Number</th>
+                      <th>Service</th>
+                      <th>Status</th>
+                      <th>Price</th>
+                      <th>Pin</th>
+                      <th>Message</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ordersTableBody">
+                    <!-- This will be populated by JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <script>
+      // Global Variables
+      let currentOrders = [];
+      let selectedService = null;
+      let selectedServiceData = null;
+      let balanceRefreshInterval;
+
+      // DOM Elements
+      const sidebar = document.getElementById("sidebar");
+      const sidebarToggle = document.getElementById("sidebarToggle");
+      const mobileToggle = document.getElementById("mobileToggle");
+      const overlay = document.getElementById("overlay");
+      const userDropdown = document.getElementById("userDropdown");
+      const dropdownMenu = document.getElementById("dropdownMenu");
+
+      // Service dropdown elements
+      const serviceDropdown = document.getElementById("serviceDropdown");
+      const serviceInput = document.getElementById("serviceInput");
+      const serviceDropdownMenu = document.getElementById(
+        "serviceDropdownMenu"
+      );
+      const serviceSearch = document.getElementById("serviceSearch");
+      const serviceOptions = document.getElementById("serviceOptions");
+      const selectedServiceInput = document.getElementById("selectedService");
+      const selectedServicePriceInput = document.getElementById(
+        "selectedServicePrice"
+      );
+
+      const countrySelect = document.getElementById("s1-country");
+      const stateSelect = document.getElementById("s1-state");
+      const orderBtn = document.getElementById("orderBtn");
+      const premiumBtn = document.getElementById("premiumBtn");
+      const smsTableBody = document.querySelector(".table tbody");
+      const orderForm = document.getElementById("orderForm");
+      const activeSMSChecks = {};
+
+      let currentService = "";
+      let currentServicePrice = 0;
+
+      // Sidebar Functionality
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener("click", () => {
+          sidebar.classList.toggle("sidebar-collapsed");
+        });
+      }
+
+      if (mobileToggle) {
+        mobileToggle.addEventListener("click", () => {
+          sidebar.classList.add("active");
+          overlay.classList.add("active");
+          document.body.style.overflow = "hidden";
+        });
+      }
+
+      if (overlay) {
+        overlay.addEventListener("click", () => {
+          sidebar.classList.remove("active");
+          overlay.classList.remove("active");
+          document.body.style.overflow = "";
+        });
+      }
+
+      // User Dropdown
+      if (userDropdown) {
+        userDropdown.addEventListener("click", (e) => {
+          e.stopPropagation();
+          dropdownMenu.classList.toggle("active");
+        });
+      }
+
+      document.addEventListener("click", (event) => {
+        if (dropdownMenu) dropdownMenu.classList.remove("active");
+        // Close service dropdown when clicking outside
+        if (serviceDropdown && !serviceDropdown.contains(event.target)) {
+          serviceDropdown.classList.remove("active");
+        }
+      });
+
+      // Searchable Dropdown Functionality
+      function initializeServiceDropdown() {
+        if (!serviceInput || !serviceDropdownMenu) return;
+
+        serviceInput.addEventListener("click", () => {
+          serviceDropdown.classList.toggle("active");
+          if (serviceDropdown.classList.contains("active")) {
+            serviceSearch.focus();
+          }
+        });
+
+        serviceInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            serviceDropdown.classList.toggle("active");
+            if (serviceDropdown.classList.contains("active")) {
+              serviceSearch.focus();
+            }
+          }
+        });
+
+        serviceSearch.addEventListener("input", (e) => {
+          filterServices(e.target.value);
+        });
+      }
+
+      function filterServices(searchTerm) {
+        if (!serviceOptions) return;
+        const options = serviceOptions.querySelectorAll(".dropdown-option");
+        searchTerm = searchTerm.toLowerCase();
+
+        options.forEach((option) => {
+          const serviceName = option
+            .querySelector(".dropdown-option-name")
+            .textContent.toLowerCase();
+          if (serviceName.includes(searchTerm)) {
+            option.style.display = "flex";
+          } else {
+            option.style.display = "none";
+          }
+        });
+      }
+
+      function selectServiceFromDropdown(serviceElement) {
+        const serviceName = serviceElement.dataset.service;
+        const servicePrice = parseFloat(serviceElement.dataset.price);
+
+        // Update UI
+        const placeholder = serviceInput.querySelector(".placeholder");
+        if (placeholder) {
+          placeholder.textContent = serviceName;
+          placeholder.classList.remove("placeholder");
+          placeholder.classList.add("selected-value");
+        }
+
+        // Update hidden inputs
+        if (selectedServiceInput) selectedServiceInput.value = serviceName;
+        if (selectedServicePriceInput)
+          selectedServicePriceInput.value = servicePrice;
+
+        // Update global variables
+        selectedService = serviceName;
+        currentService = serviceName;
+        currentServicePrice = servicePrice;
+        selectedServiceData = {
+          name: serviceName,
+          price: servicePrice,
+        };
+
+        // Remove previous selection
+        serviceOptions.querySelectorAll(".dropdown-option").forEach((opt) => {
+          opt.classList.remove("selected");
+        });
+
+        // Mark current selection
+        serviceElement.classList.add("selected");
+
+        // Close dropdown
+        serviceDropdown.classList.remove("active");
+      }
+
+      // Initialize the page
+      document.addEventListener("DOMContentLoaded", function () {
+        try {
+          initializeServiceDropdown();
+          loadServices();
+          loadExistingOrders();
+          setupEventListeners();
+          setupSearch();
+          setupFilters(); // Initialize filter functionality
+          refreshBalance();
+
+          // Set up periodic refresh for balance
+          balanceRefreshInterval = setInterval(refreshBalance, 30000);
+
+          // Start auto-checking for SMS messages on pending orders
+          startAutoSMSCheck();
+
+          // Add less frequent refresh for new orders (every 60 seconds)
+          setInterval(async () => {
+            try {
+              await loadExistingOrders();
+            } catch (error) {
+              console.log("Auto-refresh orders failed:", error.message);
+            }
+          }, 60000); // Refresh orders every 60 seconds instead of 10
+
+          } catch (error) {
+          console.error("Error during page initialization:", error);
+          showAlert(
+            "Page initialization failed. Please refresh the page.",
+            "error"
+          );
+        }
+      });
+
+      function setupEventListeners() {
+        // Handle order form submission
+        if (orderForm) {
+          orderForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            handleOrder();
+          });
+        }
+
+        // Handle order button click
+        if (orderBtn) {
+          orderBtn.addEventListener("click", (event) => {
+            event.preventDefault();
+            handleOrder();
+          });
+        }
+
+        // Handle premium button click
+        if (premiumBtn) {
+          premiumBtn.addEventListener("click", (event) => {
+            event.preventDefault();
+            handlePremiumOrder();
+          });
+        }
+      }
+
+      // API Helper Functions
+      function showAlert(message, type = "error") {
+        document.querySelectorAll(".api-alert").forEach((el) => el.remove());
+
+        const alertDiv = document.createElement("div");
+        alertDiv.className = `api-alert alert-${type}`;
+        alertDiv.textContent = message;
+
+        const content = document.querySelector(".content");
+        if (content) {
+          content.insertBefore(alertDiv, content.firstChild);
+        } else {
+          document.body.insertBefore(alertDiv, document.body.firstChild);
+        }
+
+        setTimeout(() => {
+          if (alertDiv.parentNode) {
+            alertDiv.remove();
+          }
+        }, 5000);
+      }
+
+      async function makeAPICall(url, options = {}) {
+        try {
+          const response = await fetch(url, {
+            headers: {
+              "Content-Type": "application/json",
+              ...options.headers,
+            },
+            credentials: "include",
+            ...options,
+          });
+
+          console.log(
+            `Response headers:`,
+            response.headers.get("content-type")
+          );
+
+          // Check if response is HTML (error page) instead of JSON
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("text/html")) {
+            const htmlText = await response.text();
+            console.error(
+              `Received HTML instead of JSON from ${url}:`,
+              htmlText.substring(0, 200)
+            );
+            throw new Error(
+              `Server returned HTML error page instead of JSON. Status: ${response.status}`
+            );
+          }
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              data.message ||
+                `API request failed with status ${response.status}`
+            );
+          }
+
+          return data;
+        } catch (error) {
+          console.error(`API Error for ${url}:`, error);
+
+          // Handle specific JSON parsing errors
+          if (error.message.includes("Unexpected token")) {
+            console.error(
+              "JSON parsing failed - likely received HTML instead of JSON"
+            );
+            throw new Error("Server error: received invalid response format");
+          }
+
+          throw error;
+        }
+      }
+
+      function refreshBalance() {
+        fetch("/user/api/profile-data", { credentials: "include" })
+          .then((response) => {
+            console.log("Balance API response status:", response.status);
+
+            // Check if response is HTML instead of JSON
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("text/html")) {
+              throw new Error(
+                "Received HTML instead of JSON from profile-data endpoint"
+              );
+            }
+
+            return response.json();
+          })
+          .then((data) => {
+            if (data.success) {
+              const balanceElements = document.querySelectorAll(
+                ".balance-amount, .menu-badge"
+              );
+              balanceElements.forEach((el) => {
+                el.textContent = `$${(data.user?.balance || 0).toFixed(2)}`;
+              });
+            } else {
+              console.warn("Balance refresh failed:", data.message);
+            }
+          })
+          .catch((err) => {
+            console.error("Error refreshing balance:", err);
+            // Don't show user errors for balance refresh failures
+          });
+      }
+
+      // Load services from backend
+      async function loadServices() {
+        try {
+          // Show loading state
+          if (serviceOptions) {
+            serviceOptions.innerHTML = `
+              <div class="dropdown-empty">
+                <i class="fas fa-spinner fa-spin"></i>
+                <div>Loading services...</div>
+              </div>
+            `;
+          }
+
+          const response = await fetch("/user/api/services", {
+            credentials: "include",
+          });
+          const data = await response.json();
+
+          if (data.success && data.services.length > 0) {
+            updateServiceOptions(data.services);
+          } else {
+            if (serviceOptions) {
+              serviceOptions.innerHTML = `
+                <div class="dropdown-empty">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  <div>No services found</div>
+                </div>
+              `;
+            }
+          }
+        } catch (error) {
+          console.error("Error loading services:", error);
+          if (serviceOptions) {
+            serviceOptions.innerHTML = `
+              <div class="dropdown-empty">
+                <i class="fas fa-times-circle"></i>
+                <div>Failed to load services</div>
+              </div>
+            `;
+          }
+          showAlert(
+            "Failed to load services. Please try again later.",
+            "error"
+          );
+        }
+      }
+
+      function updateServiceOptions(services) {
+        if (!serviceOptions) return;
+
+        serviceOptions.innerHTML = "";
+
+        if (services.length === 0) {
+          serviceOptions.innerHTML = `
+            <div class="dropdown-empty">
+              <i class="fas fa-exclamation-circle"></i>
+              <div>No services available</div>
+            </div>
+          `;
+          return;
+        }
+
+        services.forEach((service) => {
+          const option = document.createElement("div");
+          option.className = "dropdown-option";
+          option.dataset.service = service.value || service.name;
+          option.dataset.price = service.ltr_short_price || service.price;
+          option.onclick = () => selectServiceFromDropdown(option);
+
+          option.innerHTML = `
+            <span class="dropdown-option-name">${service.name}</span>
+            <span class="dropdown-option-price">$${
+              service.ltr_short_price || service.price
+            }</span>
+          `;
+
+          serviceOptions.appendChild(option);
+        });
+      }
+
+      async function handleOrder(event) {
+        if (event) event.preventDefault();
+
+        if (!selectedService) {
+          showAlert("Please select a service", "error");
+          return;
+        }
+
+        try {
+          if (orderBtn) {
+            orderBtn.disabled = true;
+            orderBtn.innerHTML =
+              '<i class="fas fa-spinner fa-spin"></i> Processing...';
+          }
+
+          const orderData = {
+            service: selectedService,
+            country: countrySelect?.value || "us",
+            state: stateSelect?.value || "random",
+          };
+
+          const response = await makeAPICall("/user/api/buy-number", {
+            method: "POST",
+            body: JSON.stringify(orderData),
+          });
+
+          if (response.success) {
+            showAlert("Number purchased successfully!", "success");
+            await loadExistingOrders();
+            refreshBalance();
+
+            // Reset form
+            resetForm();
+          } else {
+            showAlert(response.message || "Failed to place order", "error");
+          }
+        } catch (error) {
+          showAlert(error.message || "Failed to place order", "error");
+        } finally {
+          if (orderBtn) {
+            orderBtn.disabled = false;
+            orderBtn.innerHTML =
+              '<i class="fas fa-shopping-cart"></i> Order Number';
+          }
+        }
+      }
+
+      async function handlePremiumOrder() {
+        if (!selectedService) {
+          showAlert("Please select a service first", "error");
+          return;
+        }
+
+        const modal = document.getElementById("premiumModal");
+        const premiumServiceName =
+          document.getElementById("premiumServiceName");
+        const premiumMarkupInput = document.getElementById("premiumMarkup");
+        const premiumTotalPriceSpan =
+          document.getElementById("premiumTotalPrice");
+
+        if (modal && premiumServiceName) {
+          premiumServiceName.textContent = selectedService;
+          modal.style.display = "block";
+
+          // Reset price display
+          if (premiumTotalPriceSpan) {
+            premiumTotalPriceSpan.textContent = currentServicePrice.toFixed(2);
+          }
+          if (premiumMarkupInput) {
+            premiumMarkupInput.value = "";
+          }
+
+          // Add real-time price calculation
+          if (premiumMarkupInput && premiumTotalPriceSpan) {
+            premiumMarkupInput.addEventListener("input", function () {
+              const markup = parseFloat(this.value) || 0;
+              if (markup >= 10 && markup <= 2000) {
+                const estimatedPrice = currentServicePrice * (1 + markup / 100);
+                premiumTotalPriceSpan.textContent = estimatedPrice.toFixed(2);
+              } else if (markup === 0 || this.value === "") {
+                premiumTotalPriceSpan.textContent =
+                  currentServicePrice.toFixed(2);
+              } else {
+                premiumTotalPriceSpan.textContent = "Invalid %";
+              }
+            });
+          }
+
+          // Handle modal close
+          const closeBtn = modal.querySelector(".modal-close");
+          if (closeBtn) {
+            closeBtn.onclick = () => {
+              modal.style.display = "none";
+            };
+          }
+
+          // Handle premium order submission
+          const submitPremiumBtn = modal.querySelector("#confirmPremium");
+          if (submitPremiumBtn) {
+            submitPremiumBtn.onclick = async () => {
+              const markup = parseFloat(premiumMarkupInput.value);
+              if (!markup || markup < 10 || markup > 2000) {
+                showAlert(
+                  "Please enter a valid markup percentage (10-2000%)",
+                  "error"
+                );
+                return;
+              }
+
+              try {
+                const premiumPrice = currentServicePrice * (1 + markup / 100);
+
+                const orderData = {
+                  service: selectedService,
+                  country: countrySelect?.value || "us",
+                  state: stateSelect?.value || "random",
+                  isPremium: true,
+                  markupPercentage: markup,
+                };
+
+                const response = await makeAPICall("/user/api/buy-number", {
+                  method: "POST",
+                  body: JSON.stringify(orderData),
+                });
+
+                if (response.success) {
+                  showAlert(
+                    "Premium number order placed successfully!",
+                    "success"
+                  );
+                  await loadExistingOrders();
+                  refreshBalance();
+                  modal.style.display = "none";
+                  resetForm();
+                } else {
+                  showAlert(
+                    response.message || "Failed to place premium order",
+                    "error"
+                  );
+                }
+              } catch (error) {
+                showAlert(
+                  error.message || "Failed to place premium order",
+                  "error"
+                );
+              }
+            };
+          }
+        }
+      }
+
+      function resetForm() {
+        // Reset service dropdown
+        const placeholder = serviceInput?.querySelector(
+          ".selected-value, .placeholder"
+        );
+        if (placeholder) {
+          placeholder.textContent = "Select Service ...";
+          placeholder.className = "placeholder";
+        }
+
+        // Reset hidden inputs
+        if (selectedServiceInput) selectedServiceInput.value = "";
+        if (selectedServicePriceInput) selectedServicePriceInput.value = "";
+
+        // Reset selections
+        serviceOptions?.querySelectorAll(".dropdown-option").forEach((opt) => {
+          opt.classList.remove("selected");
+        });
+
+        // Reset global variables
+        selectedService = null;
+        currentService = "";
+        currentServicePrice = 0;
+        selectedServiceData = null;
+      }
+
+      // Load existing orders when page loads
+      async function loadExistingOrders() {
+        try {
+          const response = await makeAPICall("/user/api/orders");
+          if (response.success) {
+            currentOrders = response.orders;
+            // Enhanced logging to understand API structure
+            if (response.orders && response.orders.length > 0) {
+              // Log each order's SMS-related fields
+              response.orders.forEach((order, index) => {
+                });
+            }
+
+            updateOrdersTable(response.orders);
+          } else {
+            }
+        } catch (error) {
+          console.error("Error loading orders:", error);
+          // Show a fallback message in the table
+          const tbody = document.querySelector("#ordersTableBody");
+          if (tbody) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="8" class="table-empty">Failed to load orders. Please refresh the page.</td>
+              </tr>
+            `;
+          }
+        }
+      }
+
+      // Auto-refresh function for pending orders
+      function startAutoSMSCheck() {
+        setInterval(async () => {
+          const pendingRows = document.querySelectorAll(
+            "tr[data-order-id] .badge-warning"
+          );
+
+          for (const statusBadge of pendingRows) {
+            const orderRow = statusBadge.closest("tr");
+            const orderId = orderRow.getAttribute("data-order-id");
+
+            if (orderId) {
+              console.log("Auto-checking SMS for pending order:", orderId);
+              // Silently check without user alerts
+              try {
+                // First check request status
+                const statusResult = await makeAPICall(
+                  `/user/api/request-status/${orderId}`,
+                  {
+                    method: "GET",
+                  }
+                );
+
+                if (statusResult.success && statusResult.order) {
+                  updateSingleOrderRow(orderId, statusResult.order);
+                }
+
+                // Then check for SMS
+                const smsResult = await makeAPICall(
+                  `/user/api/check-sms/${orderId}`,
+                  {
+                    method: "GET",
+                  }
+                );
+
+                if (smsResult.success && smsResult.order) {
+                  updateSingleOrderRow(orderId, smsResult.order);
+                }
+              } catch (error) {
+                console.log(
+                  "Auto-check failed for order:",
+                  orderId,
+                  error.message
+                );
+              }
+            }
+          }
+        }, 30000); // Check every 30 seconds for pending orders (reduced from 15)
+      }
+
+      function updateOrdersTable(orders) {
+        // Store orders globally for debugging and message checking
+        window.currentOrders = orders;
+
+        const tbody = document.querySelector("#ordersTableBody");
+        if (!tbody) {
+          console.error("Table body element not found!");
+          return;
+        }
+
+        if (orders.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8" class="table-empty">No orders found</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = orders
+          .map((order) => {
+            // Log the order data to see exactly what we're receiving
+            // Debug: Check if apiResponse exists and what it contains
+            if (order.apiResponse) {
+              console.log(
+                `Order ${order._id || order.id} has apiResponse:`,
+                order.apiResponse
+              );
+              console.log(`apiResponse.pin: "${order.apiResponse.pin}"`);
+              console.log(`apiResponse.reply: "${order.apiResponse.reply}"`);
+            } else {
+              console.log(
+                `Order ${order._id || order.id} has NO apiResponse field`
+              );
+            }
+
+            // Extract PIN from available data based on Tellabot API response format
+            const extractPin = (order) => {
+              // Priority 1: Direct API response fields from Tellabot (COMPLETED ORDERS)
+              if (order.status === "completed" && order.apiResponse?.pin) {
+                return order.apiResponse.pin;
+              }
+
+              // Priority 2: Other direct fields
+              if (order.code) return order.code;
+              if (order.pin) return order.pin;
+              if (order.verification_code) return order.verification_code;
+              if (order.sms_code) return order.sms_code;
+
+              // Priority 3: Check nested SMS object
+              if (order.sms && typeof order.sms === "object") {
+                if (order.sms.code) return order.sms.code;
+                if (order.sms.pin) return order.sms.pin;
+                if (order.sms.verification_code)
+                  return order.sms.verification_code;
+              }
+
+              // Priority 4: Extract from message text using patterns (for legacy data)
+              const messageText = getMessageText(order);
+              if (messageText && order.status === "completed") {
+                // Common PIN patterns in SMS messages based on Tellabot API examples
+                const pinPatterns = [
+                  /G-(\d+)/i, // Google specific pattern (G-804036)
+                  /(?:code|pin|verification)[\s:]*(\d{4,8})/i,
+                  /(\d{4,8})[\s]*(?:is your|verification|code)/i,
+                  /your[\s]+(?:code|pin)[\s:]*(\d{4,8})/i,
+                  /\b(\d{6})\b/, // 6-digit codes are common
+                  /\b(\d{4})\b/, // 4-digit codes
+                  /\b(\d{5})\b/, // 5-digit codes
+                ];
+
+                for (const pattern of pinPatterns) {
+                  const match = messageText.match(pattern);
+                  if (match && match[1]) {
+                    return match[1];
+                  }
+                }
+              }
+
+              // Priority 5: Status-based display for PENDING/OTHER statuses
+              if (order.status === "pending") {
+                return "Waiting...";
+              } else if (order.status === "expired") {
+                return "Expired";
+              } else if (order.status === "failed") {
+                return "Failed";
+              } else if (order.status === "completed") {
+                // For completed orders, if we have apiResponse.pin, show it; otherwise show the message
+                return order.apiResponse?.pin || "API ERROR";
+              }
+
+              return "N/A";
+            };
+
+            // Helper function to get message text following Tellabot API format
+            const getMessageText = (order) => {
+              // Priority 1: Tellabot API response fields
+              if (order.apiResponse?.reply) return order.apiResponse.reply;
+              if (order.reply) return order.reply;
+              if (order.text) return order.text;
+              if (order.message) return order.message;
+
+              // Priority 2: Legacy fields
+              if (order.sms_text) return order.sms_text;
+              if (order.last_message) return order.last_message;
+
+              // Priority 3: Check nested SMS object
+              if (order.sms) {
+                if (typeof order.sms === "string") return order.sms;
+                if (order.sms.text) return order.sms.text;
+                if (order.sms.message) return order.sms.message;
+                if (order.sms.reply) return order.sms.reply;
+              }
+
+              return null;
+            };
+
+            // Get the actual message content for display following Tellabot API format
+            const getMessageContent = (order) => {
+              // For COMPLETED orders, prioritize apiResponse.reply from Tellabot
+              if (order.status === "completed" && order.apiResponse?.reply) {
+                return order.apiResponse.reply;
+              }
+
+              // Get message text using the helper function
+              const messageText = getMessageText(order);
+
+              if (messageText) {
+                return messageText;
+              }
+
+              // Status-based messages when no SMS received
+              switch (order.status) {
+                case "pending":
+                  return "Waiting for SMS...";
+                case "expired":
+                  return "Order expired - no SMS received";
+                case "failed":
+                  return "Order failed";
+                case "completed":
+                  return order.apiResponse?.reply || "API ERROR";
+                default:
+                  return "No messages yet";
+              }
+            };
+
+            return `
+          <tr data-order-id="${order._id || order.id}">
+            <td data-label="Created at">${new Date(
+              order.createdAt
+            ).toLocaleDateString()}</td>
+            <td data-label="Number" class="number-cell">
+              <span class="phone-number">${order.number || "Pending..."}</span>
+              ${
+                order.number && order.number !== "Pending..."
+                  ? `
+                <button class="copy-btn" onclick="copyToClipboard('${order.number}')" title="Copy number">
+                  <i class="fas fa-copy"></i>
+                </button>
+              `
+                  : ""
+              }
+            </td>
+            <td data-label="Service">${order.service}</td>
+            <td data-label="Status">
+              <span class="badge badge-${
+                order.status === "completed"
+                  ? "success"
+                  : order.status === "pending"
+                  ? "warning"
+                  : "danger"
+              }" data-status="${order.status.toLowerCase()}">
+                ${
+                  order.status.charAt(0).toUpperCase() +
+                  order.status.slice(1).toLowerCase()
+                }
+              </span>
+            </td>
+            <td data-label="Price">$${order.price.toFixed(2)}</td>
+            <td data-label="Pin">${extractPin(order)}</td>
+            <td data-label="Message" class="message-cell">
+              <div class="message-content">
+                <span class="message-text" id="message-${
+                  order._id || order.id
+                }">
+                  ${getMessageContent(order)}
+                </span>
+                ${
+                  order.apiResponse
+                    ? `<span class="api-badge" title="Data from Tellabot API" style="background: #28a745; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: 5px;">API</span>`
+                    : order.status === "completed"
+                    ? `<span class="api-badge" title="No API response data" style="background: #dc3545; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-left: 5px;">No API</span>`
+                    : ""
+                }
+                ${
+                  order.apiResponse?.date_time ||
+                  order.lastMessageTime ||
+                  order.messageTime ||
+                  order.receivedAt
+                    ? `
+                  <span class="message-time">
+                    ${
+                      order.apiResponse?.date_time
+                        ? order.apiResponse.date_time
+                        : new Date(
+                            order.lastMessageTime ||
+                              order.messageTime ||
+                              order.receivedAt
+                          ).toLocaleTimeString()
+                    }
+                  </span>
+                `
+                    : ""
+                }
+              </div>
+            </td>
+            <td data-label="Actions" class="actions-cell">
+              <div class="action-buttons">
+
+                <!-- NON-WORKING BUTTONS - COMMENTED OUT -->
+                <!-- 
+                <button class="action-btn hotspot-btn ${
+                  order.actions?.hotspot ? "active" : ""
+                }" 
+                        onclick="toggleAction('${
+                          order._id || order.id
+                        }', 'hotspot')" 
+                        title="Toggle Hotspot" data-action="hotspot">
+                  <i class="fas fa-wifi"></i>  
+                </button>
+                
+                <button class="action-btn dislike-btn ${
+                  order.actions?.dislike ? "active" : ""
+                }" 
+                        onclick="toggleAction('${
+                          order._id || order.id
+                        }', 'dislike')" 
+                        title="Toggle Dislike" data-action="dislike">
+                  <i class="fas fa-thumbs-down"></i>
+                </button>
+                <button class="action-btn cart-btn ${
+                  order.actions?.addToCart ? "active" : ""
+                }" 
+                        onclick="toggleAction('${
+                          order._id || order.id
+                        }', 'addToCart')" 
+                        title="Toggle Cart" data-action="cart">
+                  <i class="fas fa-shopping-cart"></i>
+                </button>
+               
+                -->
+                 <button class="action-btn renew-btn" onclick="renewOrder('${
+                   order._id || order.id
+                 }')" 
+                        title="Renew Order" data-action="renew">
+                  <i class="fas fa-redo"></i>
+                </button>
+                <button class="action-btn status-btn" onclick="checkRequestStatus('${
+                  order._id || order.id
+                }')" 
+                        title="Check Request Status" data-action="status">
+                  <i class="fas fa-info-circle"></i>
+                </button>
+                <button class="action-btn debug-btn" onclick="debugApiResponse('${
+                  order._id || order.id
+                }')" 
+                        title="Debug API Response" data-action="debug" 
+                        style="background: #6c757d;">
+                  <i class="fas fa-bug"></i>
+                </button>
+                ${
+                  order.status === "pending"
+                    ? `
+                <button class="action-btn reject-btn" onclick="rejectMDN('${
+                  order._id || order.id
+                }')" 
+                        title="Reject MDN" data-action="reject">
+                  <i class="fas fa-times"></i>
+                </button>
+                `
+                    : ""
+                }
+              </div>
+            </td>
+          </tr>
+        `;
+          })
+          .join("");
+      }
+
+      // Action button functions
+      async function checkOrderMessages(orderId) {
+        const button = document.querySelector(
+          `[onclick="checkOrderMessages('${orderId}')"]`
+        );
+        const icon = button?.querySelector("i");
+
+        if (button) button.disabled = true;
+        if (icon) icon.classList.add("fa-spin");
+
+        try {
+          const result = await makeAPICall(`/user/api/check-sms/${orderId}`, {
+            method: "GET",
+          });
+
+          console.log("Check SMS API result:", result);
+
+          if (result.success) {
+            // Handle different response formats
+            let orderData = result.order || result.data || result;
+
+            console.log("Updated order data:", orderData);
+
+            // If we got updated order data, update the specific row
+            if (orderData) {
+              updateSingleOrderRow(orderId, orderData);
+            }
+
+            showAlert("Messages checked successfully!", "success");
+
+            // Also reload all orders to ensure consistency
+            await loadExistingOrders();
+          } else {
+            showAlert(result.message || "No new messages found", "info");
+          }
+        } catch (error) {
+          console.error("Check SMS error:", error);
+          showAlert(error.message || "Failed to check messages", "error");
+        } finally {
+          if (button) button.disabled = false;
+          if (icon) icon.classList.remove("fa-spin");
+        }
+      }
+
+      // Function to update a single order row with new data
+      function updateSingleOrderRow(orderId, orderData) {
+        const orderRow = document.querySelector(
+          `tr[data-order-id="${orderId}"]`
+        );
+        if (!orderRow) return;
+
+        try {
+          // Update PIN cell
+          const pinCell = orderRow.querySelector('td[data-label="Pin"]');
+          if (pinCell) {
+            const newPin = extractPinFromOrder(orderData);
+            pinCell.textContent = newPin;
+          }
+
+          // Update Message cell
+          const messageCell = orderRow.querySelector(".message-text");
+          if (messageCell) {
+            const newMessage = getMessageFromOrder(orderData);
+            messageCell.textContent = newMessage;
+
+            // Add timestamp if available
+            const messageTime =
+              orderData.received_at ||
+              orderData.message_time ||
+              orderData.timestamp;
+            if (messageTime) {
+              const existingTime =
+                messageCell.parentNode.querySelector(".message-time");
+              if (existingTime) {
+                existingTime.textContent = new Date(
+                  messageTime
+                ).toLocaleTimeString();
+              } else {
+                const timeSpan = document.createElement("span");
+                timeSpan.className = "message-time";
+                timeSpan.textContent = new Date(
+                  messageTime
+                ).toLocaleTimeString();
+                messageCell.parentNode.appendChild(timeSpan);
+              }
+            }
+          }
+
+          // Update Status cell if status changed
+          const statusCell = orderRow.querySelector(
+            'td[data-label="Status"] .badge'
+          );
+          if (statusCell && orderData.status) {
+            statusCell.className = `badge badge-${
+              orderData.status === "completed"
+                ? "success"
+                : orderData.status === "pending"
+                ? "warning"
+                : "danger"
+            }`;
+            statusCell.textContent =
+              orderData.status.charAt(0).toUpperCase() +
+              orderData.status.slice(1).toLowerCase();
+            statusCell.dataset.status = orderData.status.toLowerCase();
+          }
+        } catch (error) {
+          console.error("Error updating order row:", error);
+        }
+      }
+
+      // Helper functions for extracting data following Tellabot API format
+      function extractPinFromOrder(order) {
+        // Priority 1: For COMPLETED orders, use Tellabot API response fields
+        if (order.status === "completed" && order.apiResponse?.pin) {
+          return order.apiResponse.pin;
+        }
+
+        // Priority 2: Other direct fields
+        if (order.code) return order.code;
+        if (order.pin) return order.pin;
+        if (order.verification_code) return order.verification_code;
+        if (order.sms_code) return order.sms_code;
+
+        if (order.sms && typeof order.sms === "object") {
+          if (order.sms.code) return order.sms.code;
+          if (order.sms.pin) return order.sms.pin;
+        }
+
+        // Priority 3: Extract from message text using Tellabot API fields (legacy support)
+        const messageText =
+          order.apiResponse?.reply ||
+          order.reply ||
+          order.text ||
+          order.message ||
+          order.sms_text ||
+          (typeof order.sms === "string" ? order.sms : null);
+
+        if (messageText && order.status === "completed") {
+          const pinPatterns = [
+            /G-(\d+)/i, // Google specific pattern (G-804036)
+            /(?:code|pin|verification)[\s:]*(\d{4,8})/i,
+            /(\d{4,8})[\s]*(?:is your|verification|code)/i,
+            /your[\s]+(?:code|pin)[\s:]*(\d{4,8})/i,
+            /\b(\d{6})\b/,
+            /\b(\d{4})\b/,
+            /\b(\d{5})\b/,
+          ];
+
+          for (const pattern of pinPatterns) {
+            const match = messageText.match(pattern);
+            if (match && match[1]) return match[1];
+          }
+        }
+
+        // Status-based display
+        if (order.status === "pending") {
+          return "Waiting...";
+        } else if (order.status === "completed") {
+          return order.apiResponse?.pin || "Api Error";
+        }
+
+        return "N/A";
+      }
+
+      function getMessageFromOrder(order) {
+        // Priority 1: For COMPLETED orders, use Tellabot API response fields
+        if (order.status === "completed" && order.apiResponse?.reply) {
+          return order.apiResponse.reply;
+        }
+
+        // Priority 2: Other message fields
+        const messageText =
+          order.reply ||
+          order.text ||
+          order.message ||
+          order.sms_text ||
+          (typeof order.sms === "string" ? order.sms : null) ||
+          (order.sms && order.sms.text) ||
+          (order.sms && order.sms.message) ||
+          (order.sms && order.sms.reply);
+
+        if (messageText) return messageText;
+
+        switch (order.status) {
+          case "pending":
+            return "Waiting for SMS...";
+          case "expired":
+            return "Order expired - no SMS received";
+          case "failed":
+            return "Order failed";
+          case "completed":
+            return order.apiResponse?.reply || "Api Error";
+          default:
+            return "No messages yet";
+        }
+      }
+
+      // COMMENTED OUT - NON-WORKING ACTION FUNCTIONS
+      /*
+      async function toggleAction(orderId, actionType) {
+        try {
+          const result = await makeAPICall(
+            `/user/api/orders/${orderId}/action`,
+            {
+              method: "POST",
+              body: JSON.stringify({ action: actionType }),
+            }
+          );
+
+          if (result.success) {
+            const button = document.querySelector(
+              `[onclick="toggleAction('${orderId}', '${actionType}')"]`
+            );
+            if (button) button.classList.toggle("active");
+            showAlert(`${actionType} toggled successfully!`, "success");
+          } else {
+            showAlert(result.message, "error");
+          }
+        } catch (error) {
+          showAlert(error.message || `Failed to toggle ${actionType}`, "error");
+        }
+      }
+      */
+
+      // Renew Order - reuse existing MDN with same service
+      async function renewOrder(orderId) {
+        if (
+          !confirm(
+            "Are you sure you want to renew this order? This will create a new order using the same phone number and service."
+          )
+        )
+          return;
+
+        const button = document.querySelector(
+          `[onclick="renewOrder('${orderId}')"]`
+        );
+        const icon = button?.querySelector("i");
+
+        if (button) button.disabled = true;
+        if (icon) {
+          icon.classList.remove("fa-redo");
+          icon.classList.add("fa-spinner", "fa-spin");
+        }
+
+        try {
+          const result = await makeAPICall(`/user/api/renew-order/${orderId}`, {
+            method: "POST",
+          });
+
+          if (result.success) {
+            showAlert(
+              `Order renewed successfully! Reusing number ${result.order.number}`,
+              "success"
+            );
+            await loadExistingOrders(); // Refresh the orders table
+            refreshBalance(); // Update balance
+          } else {
+            showAlert(result.message || "Failed to renew order", "error");
+          }
+        } catch (error) {
+          showAlert(error.message || "Failed to renew order", "error");
+        } finally {
+          if (button) button.disabled = false;
+          if (icon) {
+            icon.classList.remove("fa-spinner", "fa-spin");
+            icon.classList.add("fa-redo");
+          }
+        }
+      }
+
+      // Check request status - follows Tellabot API documentation
+      async function checkRequestStatus(orderId) {
+        try {
+          const result = await makeAPICall(
+            `/user/api/request-status/${orderId}`,
+            {
+              method: "GET",
+            }
+          );
+
+          if (result.success) {
+            showAlert("Request status updated successfully!", "success");
+            await loadExistingOrders(); // Refresh the orders table
+          } else {
+            showAlert(
+              result.message || "Failed to check request status",
+              "error"
+            );
+          }
+        } catch (error) {
+          showAlert(error.message || "Failed to check request status", "error");
+        }
+      }
+
+      // Reject MDN - follows Tellabot API documentation
+      async function rejectMDN(orderId) {
+        if (
+          !confirm(
+            "Are you sure you want to reject this MDN? This action cannot be undone."
+          )
+        )
+          return;
+
+        const button = document.querySelector(
+          `[onclick="rejectMDN('${orderId}')"]`
+        );
+        const icon = button?.querySelector("i");
+
+        if (button) button.disabled = true;
+        if (icon) {
+          icon.classList.remove("fa-times");
+          icon.classList.add("fa-spinner", "fa-spin");
+        }
+
+        try {
+          const result = await makeAPICall(`/user/api/reject-mdn/${orderId}`, {
+            method: "POST",
+          });
+
+          if (result.success) {
+            showAlert("MDN rejected successfully!", "success");
+            await loadExistingOrders(); // Refresh the orders table
+            refreshBalance(); // Refresh balance in case of refund
+          } else {
+            showAlert(result.message || "Failed to reject MDN", "error");
+          }
+        } catch (error) {
+          showAlert(error.message || "Failed to reject MDN", "error");
+        } finally {
+          if (button) button.disabled = false;
+          if (icon) {
+            icon.classList.remove("fa-spinner", "fa-spin");
+            icon.classList.add("fa-times");
+          }
+        }
+      }
+
+      // Debug API Response - shows detailed information about apiResponse field
+      function debugApiResponse(orderId) {
+        const order = currentOrders.find((o) => (o._id || o.id) === orderId);
+
+        if (!order) {
+          showAlert("Order not found in current data", "error");
+          return;
+        }
+
+        let debugInfo = `=== DEBUG INFO FOR ORDER ${orderId} ===\n\n`;
+        debugInfo += `Status: ${order.status}\n`;
+        debugInfo += `Service: ${order.service}\n`;
+        debugInfo += `Number: ${order.number}\n\n`;
+
+        debugInfo += `=== API RESPONSE FIELD ===\n`;
+        if (order.apiResponse) {
+          debugInfo += `✅ apiResponse EXISTS\n`;
+          debugInfo += `Raw apiResponse: ${JSON.stringify(
+            order.apiResponse,
+            null,
+            2
+          )}\n\n`;
+          debugInfo += `Pin: "${order.apiResponse.pin}"\n`;
+          debugInfo += `Reply: "${order.apiResponse.reply}"\n`;
+          debugInfo += `Timestamp: ${order.apiResponse.timestamp}\n`;
+          debugInfo += `Date/Time: ${order.apiResponse.date_time}\n`;
+          debugInfo += `From: ${order.apiResponse.from}\n`;
+          debugInfo += `To: ${order.apiResponse.to}\n`;
+          debugInfo += `Service: ${order.apiResponse.service}\n`;
+          debugInfo += `Price: ${order.apiResponse.price}\n`;
+        } else {
+          debugInfo += `❌ apiResponse DOES NOT EXIST\n`;
+        }
+
+        debugInfo += `\n=== OTHER FIELDS ===\n`;
+        debugInfo += `pin: "${order.pin}"\n`;
+        debugInfo += `code: "${order.code}"\n`;
+        debugInfo += `sms: "${order.sms}"\n`;
+        debugInfo += `text: "${order.text}"\n`;
+        debugInfo += `message: "${order.message}"\n`;
+        debugInfo += `reply: "${order.reply}"\n`;
+
+        debugInfo += `\n=== WHAT WILL BE DISPLAYED ===\n`;
+        debugInfo += `PIN Column: "${extractPinFromOrder(order)}"\n`;
+        debugInfo += `Message Column: "${getMessageFromOrder(order)}"\n`;
+
+        console.log(debugInfo);
+        alert(debugInfo);
+      }
+
+      // Test function to simulate API response (for debugging only)
+      function simulateApiResponse() {
+        console.log("=== SIMULATING API RESPONSE TEST ===");
+
+        // This simulates what the Tellabot API should return
+        const sampleApiResponse = {
+          timestamp: "1641234567",
+          date_time: "2024-01-03 15:30:45",
+          from: "+12345678901",
+          to: "+19876543210",
+          service: "google",
+          price: 0.25,
+          reply: "G-804036 is your Google verification code.",
+          pin: "804036",
+        };
+
+        console.log("Sample API Response:", sampleApiResponse);
+
+        // Test the extraction functions
+        const mockOrder = {
+          _id: "test123",
+          status: "completed",
+          service: "google",
+          number: "+19876543210",
+          apiResponse: sampleApiResponse,
+        };
+
+        console.log("Mock order with apiResponse:", mockOrder);
+        console.log("Extracted PIN:", extractPinFromOrder(mockOrder));
+        console.log("Extracted Message:", getMessageFromOrder(mockOrder));
+
+        alert(
+          `Test Results:\nPIN: ${extractPinFromOrder(
+            mockOrder
+          )}\nMessage: ${getMessageFromOrder(mockOrder)}`
+        );
+      }
+
+      function copyToClipboard(text) {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            showAlert("Number copied to clipboard!", "success");
+          })
+          .catch(() => {
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+            showAlert("Number copied to clipboard!", "success");
+          });
+      }
+
+      function setupSearch() {
+        const searchInput = document.querySelector(".search-input");
+        if (searchInput) {
+          searchInput.addEventListener("input", (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            applyFilters(); // Apply filters along with search
+          });
+        }
+      }
+
+      // Enhanced Filter functionality
+      function setupFilters() {
+        const statusFilter = document.getElementById("statusFilter");
+        const dateFromFilter = document.getElementById("dateFromFilter");
+        const dateToFilter = document.getElementById("dateToFilter");
+
+        // Add event listeners to all filter inputs
+        if (statusFilter) {
+          statusFilter.addEventListener("change", applyFilters);
+        }
+        if (dateFromFilter) {
+          dateFromFilter.addEventListener("change", applyFilters);
+        }
+        if (dateToFilter) {
+          dateToFilter.addEventListener("change", applyFilters);
+        }
+      }
+
+      function applyFilters() {
+        const searchTerm =
+          document.querySelector(".search-input")?.value.toLowerCase() || "";
+        const statusFilter =
+          document.getElementById("statusFilter")?.value || "all";
+        const dateFromFilter =
+          document.getElementById("dateFromFilter")?.value || "";
+        const dateToFilter =
+          document.getElementById("dateToFilter")?.value || "";
+
+        console.log("=== Apply Filters Called ===");
+        console.log("Search term:", searchTerm);
+        console.log("Status filter:", statusFilter);
+        console.log("Date from:", dateFromFilter);
+        console.log("Date to:", dateToFilter);
+
+        const rows = document.querySelectorAll(
+          "#ordersTableBody tr[data-order-id]"
+        );
+        console.log("Found rows:", rows.length);
+
+        rows.forEach((row) => {
+          let showRow = true;
+
+          // Apply search filter
+          if (searchTerm) {
+            const text = row.textContent.toLowerCase();
+            if (!text.includes(searchTerm)) {
+              showRow = false;
+            }
+          }
+
+          // Apply status filter
+          if (statusFilter !== "all") {
+            const statusCell = row.querySelector('td[data-label="Status"]');
+            const statusBadge = statusCell?.querySelector(".badge");
+            let rowStatus = "";
+
+            // Method 1: Try to get from data attribute (most reliable)
+            if (statusBadge && statusBadge.dataset.status) {
+              rowStatus = statusBadge.dataset.status.toLowerCase();
+            } else if (statusBadge) {
+              // Method 2: Get from text content as fallback
+              rowStatus = statusBadge.textContent.trim().toLowerCase();
+            }
+
+            const filterValue = statusFilter.toLowerCase();
+            console.log(
+              `Status Filter Debug: rowStatus="${rowStatus}", filterValue="${filterValue}"`
+            );
+
+            if (rowStatus !== filterValue) {
+              showRow = false;
+            }
+          }
+
+          // Apply date range filter
+          if (dateFromFilter || dateToFilter) {
+            const dateCell = row.querySelector('td[data-label="Created at"]');
+            const rowDateText = dateCell?.textContent || "";
+
+            // Parse the date from the table (assuming format like "8/3/2025")
+            const rowDate = new Date(rowDateText);
+
+            if (!isNaN(rowDate.getTime())) {
+              if (dateFromFilter) {
+                const fromDate = new Date(dateFromFilter);
+                if (rowDate < fromDate) {
+                  showRow = false;
+                }
+              }
+              if (dateToFilter) {
+                const toDate = new Date(dateToFilter);
+                toDate.setHours(23, 59, 59, 999); // End of day
+                if (rowDate > toDate) {
+                  showRow = false;
+                }
+              }
+            }
+          }
+
+          // Show/hide row based on all filters
+          row.style.display = showRow ? "" : "none";
+        });
+
+        // Update result count
+        updateFilterResultCount();
+      }
+
+      function updateFilterResultCount() {
+        const allRows = document.querySelectorAll(
+          "#ordersTableBody tr[data-order-id]"
+        );
+        const visibleRows = document.querySelectorAll(
+          "#ordersTableBody tr[data-order-id][style=''], #ordersTableBody tr[data-order-id]:not([style])"
+        );
+
+        // You can add a result count display here if needed
+        console.log(
+          `Showing ${visibleRows.length} of ${allRows.length} orders`
+        );
+      }
+
+      function resetFilters() {
+        // Reset all filter inputs
+        const statusFilter = document.getElementById("statusFilter");
+        const dateFromFilter = document.getElementById("dateFromFilter");
+        const dateToFilter = document.getElementById("dateToFilter");
+        const searchInput = document.querySelector(".search-input");
+
+        if (statusFilter) statusFilter.value = "all";
+        if (dateFromFilter) dateFromFilter.value = "";
+        if (dateToFilter) dateToFilter.value = "";
+        if (searchInput) searchInput.value = "";
+
+        // Apply filters to show all rows
+        applyFilters();
+
+        // Show success message
+        showAlert("Filters reset successfully!", "success");
+      }
+
+      // Make functions globally available
+      window.selectServiceFromDropdown = selectServiceFromDropdown;
+      window.handleOrder = handleOrder;
+      window.handlePremiumOrder = handlePremiumOrder;
+      window.toggleAction = toggleAction;
+      window.renewOrder = renewOrder;
+      window.copyToClipboard = copyToClipboard;
+      window.resetFilters = resetFilters;
+      window.applyFilters = applyFilters;
+      window.debugApiResponse = debugApiResponse;
+      window.checkRequestStatus = checkRequestStatus;
+      window.rejectMDN = rejectMDN;
+      window.simulateApiResponse = simulateApiResponse;
+
+      // Ensure functions are available immediately (defensive programming)
+      if (typeof window.resetFilters !== "function") {
+        console.error("resetFilters function not properly defined");
+        window.resetFilters = function () {
+          console.log("Emergency resetFilters called");
+          // Reset all filter inputs
+          const statusFilter = document.getElementById("statusFilter");
+          const dateFromFilter = document.getElementById("dateFromFilter");
+          const dateToFilter = document.getElementById("dateToFilter");
+          const searchInput = document.querySelector(".search-input");
+
+          if (statusFilter) statusFilter.value = "all";
+          if (dateFromFilter) dateFromFilter.value = "";
+          if (dateToFilter) dateToFilter.value = "";
+          if (searchInput) searchInput.value = "";
+
+          // Apply filters to show all rows
+          if (typeof window.applyFilters === "function") {
+            window.applyFilters();
+          }
+        };
+      }
+
+      // Handle window resize
+      window.addEventListener("resize", function () {
+        if (window.innerWidth >= 992 && overlay?.classList.contains("active")) {
+          overlay.classList.remove("active");
+          document.body.style.overflow = "";
+        }
+        if (dropdownMenu) dropdownMenu.classList.remove("active");
+      });
+
+      // iOS 100vh fix
+      function setVH() {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty("--vh", `${vh}px`);
+      }
+      window.addEventListener("resize", setVH);
+      setVH();
+
+      // Cleanup on page unload
+      window.addEventListener("beforeunload", () => {
+        if (balanceRefreshInterval) {
+          clearInterval(balanceRefreshInterval);
+        }
+      });
+    </script>
+  </body>
+</html>
