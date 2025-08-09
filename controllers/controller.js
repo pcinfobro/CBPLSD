@@ -12,9 +12,15 @@ import Ticket from "../models/ticketModel.js";
 import Order from "../models/orderModel.js";
 import Service from "../models/serviceModel.js";
 
+// Helper function to safely get user email from session
+const getUserEmail = (req) => {
+  return req.session && req.session.userEmail ? req.session.userEmail : null;
+};
+
 const protectedRoute = (handler) => async (req, res, next) => {
-  const email = req.session?.userEmail;
-  if (!email || !req.session) {
+  // Check if session exists and has userEmail
+  const email = getUserEmail(req);
+  if (!email) {
     // Set headers to prevent caching
     res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
     res.header("Expires", "-1");
@@ -57,7 +63,8 @@ class UserGetController {
 
   getTemporaryNumberPage = protectedRoute(async (req, res) => {
     try {
-      const user = await User.findOne({ email: req.session.userEmail });
+      const userEmail = getUserEmail(req);
+      const user = await User.findOne({ email: userEmail });
       const services = [
         { name: "Google", price: 0.5 },
         { name: "Facebook", price: 0.75 },
@@ -75,7 +82,8 @@ class UserGetController {
   getRentalNumberPage = protectedRoute(async (req, res) => {
     try {
       // Use a more efficient user query with only needed fields
-      const user = await User.findOne({ email: req.session.userEmail })
+      const userEmail = getUserEmail(req);
+      const user = await User.findOne({ email: userEmail })
         .select('username email balance role')
         .lean();
       
@@ -144,7 +152,8 @@ class UserGetController {
           .render("error", { message: "Invalid ticket ID format" });
       }
 
-      const user = await User.findOne({ email: req.session.userEmail });
+      const userEmail = getUserEmail(req);
+      const user = await User.findOne({ email: userEmail });
       if (!user) {
         console.log("User not found in session");
         return res.redirect("/user/signin");
@@ -185,7 +194,8 @@ class UserGetController {
 
   getOrderHistoriesPage = protectedRoute(async (req, res) => {
     try {
-      const user = await getUserData(req.session.userEmail);
+      const userEmail = getUserEmail(req);
+      const user = await getUserData(userEmail);
 
       // Fetch services data for price lookup
       const services = await Service.find({})
@@ -347,7 +357,8 @@ class UserGetController {
   };
   getTicketsPage = protectedRoute(async (req, res) => {
     try {
-      const user = await User.findOne({ email: req.session.userEmail });
+      const userEmail = getUserEmail(req);
+      const user = await User.findOne({ email: userEmail });
       if (!user) {
         return res.redirect("/user/signin");
       }
@@ -378,7 +389,8 @@ class UserGetController {
   });
 
   getDepositPage = protectedRoute(async (req, res) => {
-    const user = await getUserData(req.session.userEmail);
+    const userEmail = getUserEmail(req);
+    const user = await getUserData(userEmail);
     const deposits = await Deposit.find({ userId: user._id }).sort({
       date: -1,
     });
@@ -388,7 +400,8 @@ class UserGetController {
   getProfilePage = protectedRoute(async (req, res) => {
     try {
       // Optimized user query with only needed fields
-      const user = await User.findOne({ email: req.session.userEmail })
+      const userEmail = getUserEmail(req);
+      const user = await User.findOne({ email: userEmail })
         .select('username email balance contactMethod contactValue role isVerified createdAt lastLogin')
         .lean();
         
@@ -442,7 +455,8 @@ class UserGetController {
 
   getProfileData = protectedRoute(async (req, res) => {
     try {
-      const user = await User.findOne({ email: req.session.userEmail });
+      const userEmail = getUserEmail(req);
+      const user = await User.findOne({ email: userEmail });
       res.json({
         success: true,
         user: {
@@ -467,7 +481,8 @@ class UserGetController {
 
   index = protectedRoute(async (req, res) => {
     try {
-      const user = await User.findOne({ email: req.session.userEmail });
+      const userEmail = getUserEmail(req);
+      const user = await User.findOne({ email: userEmail });
       if (!user) {
         return res.redirect("/user/signin");
       }
@@ -576,7 +591,8 @@ class UserPostController {
         });
       }
 
-      const user = await User.findOne({ email: req.session.userEmail });
+      const userEmail = getUserEmail(req);
+      const user = await User.findOne({ email: userEmail });
       if (!user) {
         return res.status(401).json({
           success: false,
@@ -648,7 +664,8 @@ class UserPostController {
   createCryptoDeposit = protectedRoute(async (req, res) => {
     try {
       const { amount, currency, network } = req.body;
-      const user = await getUserData(req.session.userEmail);
+      const userEmail = getUserEmail(req);
+      const user = await getUserData(userEmail);
 
       if (!amount || !currency) {
         return res.status(400).json({
@@ -723,9 +740,9 @@ class UserPostController {
         });
       }
 
-      const user = await User.findOne({ email: req.session.userEmail });
+      const user = await User.findOne({ email: getUserEmail(req) });
       if (!user) {
-        console.log("User not found for email:", req.session.userEmail);
+        console.log("User not found for email:", getUserEmail(req));
         return res.status(404).json({
           success: false,
           message: "User not found",
@@ -804,7 +821,8 @@ class UserPostController {
 
   createDeposit = protectedRoute(async (req, res) => {
     const { amount, method } = req.body;
-    const user = await getUserData(req.session.userEmail);
+    const userEmail = getUserEmail(req);
+    const user = await getUserData(userEmail);
 
     const newDeposit = new Deposit({
       userId: user._id,
@@ -824,8 +842,9 @@ class UserPostController {
   updateProfile = protectedRoute(async (req, res) => {
     try {
       const { username, contactMethod, contactValue } = req.body;
+      const userEmail = getUserEmail(req);
       const user = await User.findOneAndUpdate(
-        { email: req.session.userEmail },
+        { email: userEmail },
         {
           username,
           contactMethod,
@@ -876,8 +895,9 @@ class UserPostController {
   toggleTwoFactor = protectedRoute(async (req, res) => {
     try {
       const { enabled } = req.body;
+      const userEmail = getUserEmail(req);
       await User.findOneAndUpdate(
-        { email: req.session.userEmail },
+        { email: userEmail },
         { twoFactorEnabled: enabled }
       );
       res.json({ success: true });
@@ -897,7 +917,8 @@ class UserPostController {
 
   initiateRecovery = protectedRoute(async (req, res) => {
     try {
-      const user = await User.findOne({ email: req.session.userEmail });
+      const userEmail = getUserEmail(req);
+      const user = await User.findOne({ email: userEmail });
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
@@ -906,8 +927,9 @@ class UserPostController {
 
   deactivateAccount = protectedRoute(async (req, res) => {
     try {
+      const userEmail = getUserEmail(req);
       await User.findOneAndUpdate(
-        { email: req.session.userEmail },
+        { email: userEmail },
         { active: false, deactivatedAt: new Date() }
       );
       res.json({ success: true });
@@ -943,7 +965,7 @@ class UserPostController {
       };
 
       await User.findOneAndUpdate(
-        { email: req.session.userEmail },
+        { email: getUserEmail(req) },
         { notificationSettings: settings }
       );
 
@@ -1158,8 +1180,11 @@ class UserPostController {
 
   signInUser = async (req, res) => {
     const { email, password } = req.body;
+    
+    console.log('Login attempt for email:', email);
 
     if (!req.body["g-recaptcha-response"]) {
+      console.log('Login failed: Missing captcha for', email);
       return res
         .status(404)
         .render("signin", { message: "Please select captcha" });
@@ -1167,12 +1192,21 @@ class UserPostController {
 
     try {
       const user = await User.findOne({ email });
-      if (!user)
+      if (!user) {
+        console.log('Login failed: User not found for', email);
         return res
           .status(404)
           .render("signin", { message: "User doesn't exist" });
+      }
+
+      console.log('User found:', {
+        email: user.email,
+        isVerified: user.isVerified,
+        active: user.active !== false
+      });
 
       if (!(await bcrypt.compare(password, user.password))) {
+        console.log('Login failed: Invalid password for', email);
         return res
           .status(400)
           .render("signin", { message: "Invalid credentials" });
@@ -1180,23 +1214,43 @@ class UserPostController {
 
       // Check if email is verified
       if (!user.isVerified) {
+        console.log('Login failed: Email not verified for', email);
         return res.status(403).render("signin", {
           message:
             "Please verify your email first. <a href='#' id='resendVerification'>Resend verification email</a>",
         });
       }
 
+      // Check if account is active
+      if (user.active === false) {
+        console.log('Login failed: Account deactivated for', email);
+        return res.status(403).render("signin", {
+          message: "Your account has been deactivated. Please contact support.",
+        });
+      }
+
+      console.log('Login successful for:', email);
       req.session.userEmail = email;
+      
+      // Save session explicitly before redirect to avoid race conditions
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).render("signin", { message: "Session error occurred" });
+        }
+        
+        console.log('Session saved successfully for:', email);
+        res.header(
+          "Cache-Control",
+          "private, no-cache, no-store, must-revalidate"
+        );
+        res.header("Expires", "-1");
+        res.header("Pragma", "no-cache");
 
-      res.header(
-        "Cache-Control",
-        "private, no-cache, no-store, must-revalidate"
-      );
-      res.header("Expires", "-1");
-      res.header("Pragma", "no-cache");
-
-      res.redirect("/user/index");
+        res.redirect("/user/index");
+      });
     } catch (error) {
+      console.error('Login error for', email, ':', error);
       res.status(500).render("signin", { message: error.message });
     }
   };
@@ -1264,7 +1318,8 @@ class UserPostController {
     }
 
     try {
-      const user = await User.findOne({ email: req.session.userEmail });
+      const userEmail = getUserEmail(req);
+      const user = await User.findOne({ email: userEmail });
       if (!user) {
         return res.redirect(
           "/user/user-profile?error=" + encodeURIComponent("User not found")

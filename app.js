@@ -138,22 +138,35 @@ app.set("views", path.join(path.resolve(), "views"));
 app.use(async (req, res, next) => {
     // Session health check - prevent hanging sessions
     if (req.session && req.session.userEmail) {
-        // Check if session is too old or corrupted
-        const sessionAge = Date.now() - (req.session.cookie.originalMaxAge || 0);
+        console.log('Session middleware: Processing user session for:', req.session.userEmail);
+        
+        // Temporarily disable session age check to debug the login issue
+        // TODO: Re-enable session age validation after fixing login
+        /*
+        const sessionCreatedAt = req.session.cookie._created || req.session.cookie.originalMaxAge;
+        const sessionAge = sessionCreatedAt ? Date.now() - sessionCreatedAt : 0;
+        
+        console.log('Session check for user:', req.session.userEmail);
+        console.log('Session age (minutes):', Math.round(sessionAge / 60000));
+        
         if (sessionAge > 4 * 60 * 60 * 1000) { // 4 hours
-            console.log('Session expired, destroying session for user:', req.session.userEmail);
+            console.log('Session expired due to age, destroying session for user:', req.session.userEmail);
             req.session.destroy();
             res.locals.user = null;
             return next();
         }
+        */
 
         // Check if user data is already cached in session
         if (req.session.userData && Date.now() - req.session.userData.lastFetch < 300000) { // 5 minutes cache
             res.locals.user = req.session.userData.user;
         } else {
             try {
+                console.log('Middleware: Looking up user for email:', req.session.userEmail);
                 const user = await User.findOne({ email: req.session.userEmail }).lean(); // Use lean() for better performance
+                console.log('Middleware: User found in database:', user ? 'YES' : 'NO');
                 if (user) {
+                    console.log('Middleware: User data retrieved successfully');
                     const userData = {
                         username: user.username,
                         email: user.email,
@@ -167,7 +180,18 @@ app.use(async (req, res, next) => {
                         lastFetch: Date.now()
                     };
                 } else {
-                    console.log('User not found in database, destroying session for:', req.session.userEmail);
+                    console.log('Session expired, destroying session for user:', req.session.userEmail);
+                    console.log('Reason: User not found in database - user may have been deleted or there is a database issue');
+                    console.log('DEBUG: Checking if user exists with different query...');
+                    
+                    // Debug: Try to find user with additional logging
+                    const debugUser = await User.findOne({ email: req.session.userEmail });
+                    console.log('DEBUG: Raw user query result:', debugUser ? 'FOUND' : 'NOT FOUND');
+                    if (debugUser) {
+                        console.log('DEBUG: User exists but lean query failed. User active status:', debugUser.active);
+                        console.log('DEBUG: User verified status:', debugUser.isVerified);
+                    }
+                    
                     req.session.destroy();
                     res.locals.user = null;
                 }
