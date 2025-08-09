@@ -82,14 +82,6 @@ router.post("/user/api/orders/:id/action", protectedAPIRoute, numberController.t
 router.get("/api/services", userGetController.getServices);
 router.get("/user/api/services", userGetController.getServices);
 router.get("/api/test-tellabot", numberController.testTellabotAPI);
-router.get("/api/healthcheck", (req, res) => {
-  res.json({
-    success: true,
-    authenticated: !!req.session.userEmail,
-    sessionAge: req.session.cookie ? Date.now() - req.session.cookie.originalMaxAge : null,
-    timestamp: new Date().toISOString()
-  });
-});
 router.get(
   "/api/profile-data",
   protectedRoute,
