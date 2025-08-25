@@ -5,7 +5,7 @@ export const protectedRoute = (handler) => async (req, res, next) => {
         res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
         res.header('Expires', '-1');
         res.header('Pragma', 'no-cache');
-        return res.redirect('/user/signin');
+    return res.redirect('/user/login');
     }
     
     try {
@@ -16,12 +16,12 @@ export const protectedRoute = (handler) => async (req, res, next) => {
                 const user = await User.findOne({ email }).lean();
                 if (!user) {
                     req.session.destroy();
-                    return res.redirect('/user/signin');
+                    return res.redirect('/user/login');
                 }
                 
                 if (!user.isVerified) {
                     req.session.destroy();
-                    return res.redirect('/user/signin?message=Please verify your email first');
+                    return res.redirect('/user/login?message=Please verify your email first');
                 }
                 
                 // Update cache
@@ -36,12 +36,12 @@ export const protectedRoute = (handler) => async (req, res, next) => {
             const user = await User.findOne({ email }).lean();
             if (!user) {
                 req.session.destroy();
-                return res.redirect('/user/signin');
+                return res.redirect('/user/login');
             }
             
             if (!user.isVerified) {
                 req.session.destroy();
-                return res.redirect('/user/signin?message=Please verify your email first');
+                return res.redirect('/user/login?message=Please verify your email first');
             }
             
             req.user = user;
@@ -80,4 +80,3 @@ const checkBalance = async (req, res, next) => {
   }
 };
 
-};

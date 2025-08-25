@@ -25,7 +25,7 @@ const protectedRoute = (handler) => async (req, res, next) => {
     res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
     res.header("Expires", "-1");
     res.header("Pragma", "no-cache");
-    return res.redirect("/user/signin");
+  return res.redirect("/user/login");
   }
   try {
     // Add cache control headers to all protected responses
@@ -88,7 +88,7 @@ class UserGetController {
         .lean();
       
       if (!user) {
-        return res.redirect("/user/signin");
+  return res.redirect("/user/login");
       }
 
       // Use Promise.all to run queries in parallel for better performance
@@ -156,7 +156,7 @@ class UserGetController {
       const user = await User.findOne({ email: userEmail });
       if (!user) {
         console.log("User not found in session");
-        return res.redirect("/user/signin");
+  return res.redirect("/user/login");
       }
 
       const ticket = await Ticket.findOne({
@@ -360,7 +360,7 @@ class UserGetController {
       const userEmail = getUserEmail(req);
       const user = await User.findOne({ email: userEmail });
       if (!user) {
-        return res.redirect("/user/signin");
+  return res.redirect("/user/login");
       }
 
       const tickets = await Ticket.find({ userId: user._id })
@@ -406,7 +406,7 @@ class UserGetController {
         .lean();
         
       if (!user) {
-        return res.redirect("/user/signin");
+  return res.redirect("/user/login");
       }
 
       const userBalance = Number(user.balance) || 0;
@@ -480,13 +480,17 @@ class UserGetController {
   });
 
   index = protectedRoute(async (req, res) => {
+    console.log('Index route accessed by user:', req.session.userEmail);
     try {
       const userEmail = getUserEmail(req);
+      console.log('User email from session:', userEmail);
       const user = await User.findOne({ email: userEmail });
       if (!user) {
-        return res.redirect("/user/signin");
+        console.log('User not found, redirecting to signin');
+  return res.redirect("/user/login");
       }
 
+      console.log('User found, loading dashboard for:', user.email);
       user.lastLogin = new Date();
       await user.save();
 
@@ -564,7 +568,7 @@ class UserGetController {
       res.header("Expires", "-1");
       res.header("Pragma", "no-cache");
 
-      res.redirect("/user/signin");
+  res.redirect("/user/login");
     });
   };
 }
@@ -1240,6 +1244,9 @@ class UserPostController {
         }
         
         console.log('Session saved successfully for:', email);
+          console.log('About to redirect to /user/dashboard');
+        
+        // Set cache control headers
         res.header(
           "Cache-Control",
           "private, no-cache, no-store, must-revalidate"
@@ -1247,7 +1254,46 @@ class UserPostController {
         res.header("Expires", "-1");
         res.header("Pragma", "no-cache");
 
-        res.redirect("/user/index");
+        console.log('Sending success response with redirect instruction');
+        
+        // Instead of server redirect, send success response with redirect instruction
+        res.status(200).send(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Login Successful</title>
+            <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+            <style>
+              body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f8f9fa; }
+              .loading-text { margin-top: 20px; font-size: 1.2em; color: #333; }
+            </style>
+            <script>
+              console.log('Login successful, redirecting to dashboard...');
+              setTimeout(function() {
+                  window.location.href = '/user/dashboard';
+              }, 1200);
+            </script>
+          </head>
+          <body>
+            <lottie-player
+              src="/assets/animations/loading hand blue.json"
+              background="transparent"
+              speed="1"
+              style="width: 200px; height: 200px;"
+              loop
+              autoplay
+            ></lottie-player>
+            <div class="loading-text">Logging in... Please wait</div>
+            <script>
+                if (window.location.href.indexOf('/user/dashboard') === -1) {
+                  window.location.href = '/user/dashboard';
+              }
+            </script>
+          </body>
+          </html>
+        `);
+        
+        console.log('Success response sent with client-side redirect');
       });
     } catch (error) {
       console.error('Login error for', email, ':', error);

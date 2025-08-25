@@ -2082,10 +2082,10 @@ p {
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <a href="/user/index" class="logo">
+                <a href="/user/dashboard" class="logo">
                     <div class="logo-container">
                         <div class="logo-icon">
-                            <img src="/assets/images/codebypass-logo/codebypass-icon-white-bg.png" alt="CodeByPass Icon">
+                            <img src="/assets/images/codebypass-logo/codebypass-logo-white-text-bg.png" alt="CodeByPass Icon">
                         </div>
                         <img src="/assets/images/codebypass-logo/codebypass-logo-white-text-bg.png" alt="CodeByPass" class="logo-text">
                     </div>
@@ -2095,7 +2095,7 @@ p {
             <div class="sidebar-menu">
                 <ul>
                     <li class="menu-item">
-                        <a href="/user/index" class="menu-link">
+                        <a href="/user/dashboard" class="menu-link">
                             <span class="menu-icon"><i class="fas fa-th-large"></i></span>
                             <span class="menu-text">Dashboard</span>
                         </a>
@@ -2538,9 +2538,9 @@ if (deposit.paymentData?.address) {
     openPaymentBtn.onclick = () => {
         window.open(deposit.paymentUrl, '_blank');
         // Check every 5 seconds if balance needs updating
-        const balanceCheckInterval = setInterval(refreshBalance, 5000);
+        const balanceCheckInterval = setInterval('balance-refresh', refreshBalance, 5000);
         // Stop checking after 5 minutes
-        setTimeout(() => clearInterval(balanceCheckInterval), 300000);
+        setTimeout(() => clearInterval('balanceCheck'), 300000);
     };
             // Show modal
             modal.style.display = 'flex';

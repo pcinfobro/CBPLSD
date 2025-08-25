@@ -4,7 +4,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.hostinger.com',
+    port: 465,
+    secure: true, // true for 465, false for other ports
     auth: {
         user: process.env.EMAIL,
         pass: process.env.PASSWORD
@@ -14,11 +16,9 @@ export const transporter = nodemailer.createTransport({
     }
 });
 
-// Test connection on startup
+// Verify transport in all environments; only log errors (no noisy success log)
 transporter.verify((error) => {
     if (error) {
         console.error('Mail server error:', error);
-    } else {
-        console.log('Mail server is ready');
     }
 });

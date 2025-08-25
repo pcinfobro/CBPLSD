@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "production": "NODE_ENV=production node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -32,5 +34,7 @@
     "passport-google-oauth20": "^2.0.0",
     "path": "^0.12.7",
     "uuid": "^11.1.0"
+  ,
+  "googleapis": "^133.0.0"
   }
 }

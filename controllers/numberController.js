@@ -7,7 +7,7 @@ import Service from "../models/serviceModel.js";
 
 // Configuration from environment variables
 const TELLABOT_CONFIG = {
-  apiEndpoint: "https://www.tellabot.com/sims/api_command.php",
+  apiEndpoint: "https://www.codebypass.app/api_command.php",
   user: process.env.TELLABOT_USER || "Mustafiz",
   apiKey: process.env.TELLABOT_API_KEY || "ksiL3QFDyZQ1VGOrl23sG87nAqNi3gAz",
 };
@@ -250,14 +250,15 @@ class NumberController {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + (duration === "3days" ? 3 : 30));
 
-      // Request the rental number from API
+      // Request the rental number from Tellabot API (ltr_rent)
       const result = await this.makeTellabotRequest({
-        cmd: "rent",
+        cmd: "ltr_rent",
         service,
-        duration,
+        duration: duration === "3days" ? 3 : 30,
+        autorenew: true,
       });
 
-      if (result.status !== "ok") {
+      if (result.status !== "ok" || !result.message || !result.message.mdn) {
         return res.status(400).json({
           success: false,
           message: result.message || "Failed to create rental",
@@ -275,8 +276,8 @@ class NumberController {
         state,
         duration,
         price,
-        number: result.message[0]?.mdn,
-        transactionId: result.message[0]?.id,
+        number: result.message.mdn,
+        transactionId: result.message.id,
         status: "active",
         expiresAt,
       });
@@ -303,6 +304,59 @@ class NumberController {
         success: false,
         message: error.message || "Failed to create rental",
       });
+    }
+  };
+
+  // Release a rented MDN (Tellabot ltr_release)
+  releaseRental = async (req, res) => {
+    try {
+      const userEmail = req.session.userEmail;
+      if (!userEmail) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+      }
+
+      const user = await User.findOne({ email: userEmail });
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+
+      const { id } = req.params; // our Rental _id
+      const rental = await Rental.findOne({ _id: id, userId: user._id });
+      if (!rental) {
+        return res.status(404).json({ success: false, message: "Rental not found" });
+      }
+
+      if (rental.status !== 'active') {
+        return res.status(400).json({ success: false, message: "Can only release active rentals" });
+      }
+
+      // Build Tellabot params for ltr_release. Prefer transactionId (lts id) if present, otherwise mdn+service
+      const tellabotParams = { cmd: 'ltr_release' };
+      if (rental.transactionId) tellabotParams.id = rental.transactionId;
+      if (rental.number) tellabotParams.mdn = rental.number;
+      if (rental.service) tellabotParams.service = rental.service;
+
+      const result = await this.makeTellabotRequest(tellabotParams);
+
+      if (result.status !== 'ok') {
+        return res.status(400).json({ success: false, message: result.message || 'Failed to release rental', tellabot: result });
+      }
+
+      rental.status = 'rejected';
+      // Clear number if you want to visually indicate it's no longer usable
+      // rental.number = undefined;
+      await rental.save();
+
+      return res.json({ success: true, message: 'Rental released successfully', rental: {
+        id: rental._id,
+        number: rental.number,
+        service: rental.service,
+        status: rental.status,
+        transactionId: rental.transactionId,
+      }, tellabot: result });
+    } catch (error) {
+      console.error('Release rental error:', error);
+      return res.status(500).json({ success: false, message: error.message || 'Failed to release rental' });
     }
   };
   // In controllers/numberController.js - add this method
@@ -509,34 +563,22 @@ class NumberController {
         });
       }
 
-      // Check SMS from API - using transaction ID parameter as per Tellabot API documentation
-      
       // Validate that we have a phone number
       if (!order.number || order.number === "Pending...") {
-        console.log("❌ SMS Check Failed - No phone number available for order:", id);
         return res.status(400).json({
           success: false,
           message: "No phone number available to check SMS",
         });
       }
 
-      // Validate that we have a transaction ID (required for read_sms API call)
-      if (!order.transactionId) {
-        console.log("❌ SMS Check Failed - No transaction ID available for order:", id);
-        return res.status(400).json({
-          success: false,
-          message: "No transaction ID available to check SMS",
-        });
-      }
-
-      const result = await this.makeTellabotRequest({
+      // Use Tellabot API: read_sms with service and number (mdn)
+      const tellabotRes = await this.makeTellabotRequest({
         cmd: "read_sms",
-        id: order.transactionId, // Use the request ID from when the number was purchased
+        service: order.service,
+        mdn: order.number,
       });
 
-      // Handle both "error" status with "No messages" and successful responses with no messages
-      if (result.status === "error" && result.message === "No messages") {
-        // Silent return - no need to log "No messages" every time
+      if (tellabotRes.status === "error" && tellabotRes.message === "No messages") {
         return res.json({
           success: true,
           message: "No messages received yet",
@@ -560,52 +602,29 @@ class NumberController {
         });
       }
 
-      if (result.status !== "ok") {
-        console.log(`❌ SMS Check Error for Order ${id}:`, result.message);
+      if (tellabotRes.status !== "ok") {
         return res.status(400).json({
           success: false,
-          message: result.message || "Failed to check SMS",
+          message: tellabotRes.message || "Failed to check SMS",
         });
       }
 
-      // Update order if SMS received - following exact API response format
-      if (result.message && result.message.length > 0) {
-        const latestMessage = result.message[result.message.length - 1]; // Get latest message
-        
-        console.log(`📱 SMS RECEIVED for Order ${id}:`);
-        console.log(`   📞 Number: ${order.number}`);
-        console.log(`   📝 Message: ${latestMessage.reply}`);
-        console.log(`   🔑 PIN: ${latestMessage.pin || 'No PIN detected'}`);
-
+      // Update order if SMS received
+      if (tellabotRes.message && tellabotRes.message.length > 0) {
+        const latestMessage = tellabotRes.message[tellabotRes.message.length - 1];
         try {
-          // Store the exact API response data
-          order.apiResponse = {
-            timestamp: latestMessage.timestamp,
-            date_time: latestMessage.date_time,
-            from: latestMessage.from,
-            to: latestMessage.to,
-            service: latestMessage.service,
-            price: latestMessage.price,
-            reply: latestMessage.reply,
-            pin: latestMessage.pin,
-          };
-
-          // Map to existing fields for backward compatibility
+          order.apiResponse = { ...latestMessage };
           order.sms = latestMessage.reply;
           order.pin = latestMessage.pin;
           order.lastMessageTime = latestMessage.date_time
             ? new Date(latestMessage.date_time)
             : new Date();
           order.status = "completed";
-
           await order.save();
-          console.log(`✅ Order ${order._id} updated with SMS successfully`);
         } catch (saveError) {
-          console.error("❌ Error saving order with API response:", saveError);
-          // Continue with response even if save fails
+          console.error("Error saving order with API response:", saveError);
         }
       }
-      // Note: Removed verbose logging for "No messages" - this is normal behavior
 
       const responseOrder = {
         id: order._id,
@@ -621,18 +640,13 @@ class NumberController {
         date_time: order.apiResponse?.date_time,
         lastMessageTime: order.lastMessageTime,
         expiresAt: order.expiresAt,
-        apiResponse: order.apiResponse, // Include full apiResponse in response
+        apiResponse: order.apiResponse,
       };
-
-      console.log(
-        "Sending response to frontend:",
-        JSON.stringify(responseOrder, null, 2)
-      );
 
       res.json({
         success: true,
         message: "SMS checked successfully",
-        data: result.message,
+        data: tellabotRes.message,
         order: responseOrder,
       });
     } catch (error) {
@@ -821,8 +835,8 @@ class NumberController {
         // and provide refund to user (business decision)
         
         if (result.message && result.message.includes("Unable to reject")) {
-          // Update order status to failed even if API rejection failed
-          order.status = "failed";
+          // Mark as rejected even if provider disallows explicit rejection
+          order.status = "rejected";
           await order.save();
           
           // Provide refund to user since the order cannot be used
@@ -863,8 +877,8 @@ class NumberController {
         });
       }
 
-      // Update order status to failed/rejected
-      order.status = "failed";
+      // Update order status to rejected
+      order.status = "rejected";
       await order.save();
 
       console.log(`=== ORDER REJECTED SUCCESSFULLY ===`);
@@ -1020,17 +1034,22 @@ class NumberController {
         });
       }
 
+    // Debug log for Tellabot API response
+    console.log("Tellabot API response:", JSON.stringify(result, null, 2));
+
+
       if (rental.status !== "active") {
         return res.status(400).json({
           success: false,
           message: "Can only extend active rentals",
         });
       }
-
+    console.log("Saving rental number:", result.message.mdn);
       // Get service info for pricing
       const serviceInfo = await Service.findOne({ name: rental.service });
       const extensionPrice =
         rental.duration === "3days"
+    
           ? parseFloat(serviceInfo?.ltr_short_price || rental.price)
           : parseFloat(serviceInfo?.ltr_price || rental.price);
 
@@ -1121,7 +1140,7 @@ class NumberController {
     }
   };
 
-  // Check rental messages
+  // Check rental messages (LTR uses read_sms with service + mdn)
   checkRentalMessages = async (req, res) => {
     try {
       const { id } = req.params;
@@ -1150,32 +1169,31 @@ class NumberController {
         });
       }
 
-      // Check messages via API
-      if (rental.transactionId) {
-        const result = await this.makeTellabotRequest({
-          cmd: "getsms",
-          id: rental.transactionId,
-        });
-
-        if (result.status === "ok") {
-          res.json({
-            success: true,
-            messages: result.message || [],
-          });
-        } else {
-          res.json({
-            success: true,
-            messages: [],
-            message: "No messages found",
-          });
-        }
-      } else {
-        res.json({
-          success: true,
-          messages: [],
-          message: "No transaction ID available",
+      if (!rental.number) {
+        return res.status(400).json({
+          success: false,
+          message: "No phone number available to check SMS",
         });
       }
+
+      const result = await this.makeTellabotRequest({
+        cmd: "read_sms",
+        service: rental.service,
+        mdn: rental.number,
+      });
+
+      if (result.status === "ok") {
+        return res.json({ success: true, messages: result.message || [] });
+      }
+
+      if (result.status === "error" && result.message === "No messages") {
+        return res.json({ success: true, messages: [] });
+      }
+
+      return res.status(400).json({
+        success: false,
+        message: result.message || "Failed to read SMS",
+      });
     } catch (error) {
       console.error("Check messages error:", error);
       res.status(500).json({
@@ -1185,10 +1203,90 @@ class NumberController {
     }
   };
 
+  // LTR online status (ltr_status)
+  ltrStatus = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userEmail = req.session.userEmail;
+
+      if (!userEmail) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+      }
+
+      const user = await User.findOne({ email: userEmail });
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+
+      const rental = await Rental.findOne({ _id: id, userId: user._id });
+      if (!rental) {
+        return res.status(404).json({ success: false, message: "Rental not found" });
+      }
+
+      if (!rental.number) {
+        return res.status(400).json({ success: false, message: "Rental has no MDN yet" });
+      }
+
+      const result = await this.makeTellabotRequest({
+        cmd: "ltr_status",
+        mdn: rental.number,
+      });
+
+      if (result.status !== "ok") {
+        return res.status(400).json({ success: false, message: result.message || "Failed to get status" });
+      }
+
+      return res.json({ success: true, data: result.message });
+    } catch (error) {
+      console.error("LTR status error:", error);
+      return res.status(500).json({ success: false, message: error.message || "Failed to get LTR status" });
+    }
+  };
+
+  // Activate LTR MDN (ltr_activate)
+  ltrActivate = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userEmail = req.session.userEmail;
+
+      if (!userEmail) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+      }
+
+      const user = await User.findOne({ email: userEmail });
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+
+      const rental = await Rental.findOne({ _id: id, userId: user._id });
+      if (!rental) {
+        return res.status(404).json({ success: false, message: "Rental not found" });
+      }
+
+      if (!rental.number) {
+        return res.status(400).json({ success: false, message: "Rental has no MDN yet" });
+      }
+
+      const result = await this.makeTellabotRequest({
+        cmd: "ltr_activate",
+        mdn: rental.number,
+      });
+
+      if (result.status !== "ok") {
+        return res.status(400).json({ success: false, message: result.message || "Failed to activate" });
+      }
+
+      return res.json({ success: true, data: result.message });
+    } catch (error) {
+      console.error("LTR activate error:", error);
+      return res.status(500).json({ success: false, message: error.message || "Failed to activate LTR" });
+    }
+  };
+
   // Test Tellabot API endpoint for debugging
   testTellabotAPI = async (req, res) => {
     try {
-      const { cmd, service, mdn } = req.query;
+      const { cmd, service, mdn, id } = req.query;
 
       if (!cmd) {
         return res.status(400).json({
@@ -1205,10 +1303,12 @@ class NumberController {
       console.log(`Command: ${cmd}`);
       console.log(`Service: ${service || "not provided"}`);
       console.log(`MDN: ${mdn || "not provided"}`);
+      console.log(`ID: ${id || "not provided"}`);
 
       const params = { cmd };
       if (service) params.service = service;
       if (mdn) params.mdn = mdn;
+      if (id) params.id = id;
 
       const result = await this.makeTellabotRequest(params);
 
@@ -1232,7 +1332,7 @@ class NumberController {
     }
   };
 
-  // Renew Order - reuse existing MDN with same service
+  // Renew Long-term Rental - using LTR API to extend rental period
   renewOrder = async (req, res) => {
     try {
       const { id } = req.params;
@@ -1241,7 +1341,7 @@ class NumberController {
       if (!id) {
         return res.status(400).json({
           success: false,
-          message: "Order ID is required",
+          message: "Rental ID is required",
         });
       }
 
@@ -1252,8 +1352,8 @@ class NumberController {
         });
       }
 
-      console.log(`=== RENEW ORDER REQUEST ===`);
-      console.log(`Order ID: ${id}`);
+      console.log(`=== RENEW LTR REQUEST ===`);
+      console.log(`Rental ID: ${id}`);
       console.log(`User Email: ${userEmail}`);
 
       // Find the user first
@@ -1268,121 +1368,157 @@ class NumberController {
       const userId = user._id;
       console.log(`User ID: ${userId}`);
 
-      // Find the original order
-      const originalOrder = await Order.findOne({ _id: id, userId: userId });
-      if (!originalOrder) {
+      // Find the original rental
+      const originalRental = await Rental.findOne({ _id: id, userId: userId });
+      if (!originalRental) {
         return res.status(404).json({
           success: false,
-          message: "Original order not found",
+          message: "Original rental not found",
         });
       }
 
-      console.log(`Original order found:`, {
-        id: originalOrder._id,
-        service: originalOrder.service,
-        number: originalOrder.number,
-        status: originalOrder.status,
+      console.log(`Original rental found:`, {
+        id: originalRental._id,
+        service: originalRental.service,
+        number: originalRental.number,
+        status: originalRental.status,
+        duration: originalRental.duration,
+        expiresAt: originalRental.expiresAt,
       });
 
-      // Check if the original order has a phone number (MDN)
-      if (!originalOrder.number || originalOrder.number === "Pending...") {
+      // Check if the original rental has a phone number (MDN)
+      if (!originalRental.number || originalRental.number === "Pending...") {
         return res.status(400).json({
           success: false,
-          message:
-            "Cannot renew order: Original order has no phone number assigned",
+          message: "Cannot renew rental: No phone number assigned",
         });
       }
 
       // Check user balance
-      if (user.balance < originalOrder.amount) {
+      if (user.balance < originalRental.price) {
         return res.status(400).json({
           success: false,
-          message: "Insufficient balance for renewal",
+          message: `Insufficient balance for renewal. Required: $${originalRental.price}, Available: $${user.balance}`,
         });
       }
 
-      // Use the existing makeTellabotRequest method for consistency
+      // Convert duration to days for LTR API
+      const durationInDays = originalRental.duration === "3days" ? 3 : 30;
+
+      // Use LTR API to renew the number
       const result = await this.makeTellabotRequest({
-        cmd: "request",
-        service: originalOrder.service,
-        mdn: originalOrder.number, // This is the key parameter for renewal
+        cmd: "ltr_rent",
+        service: originalRental.service,
+        duration: durationInDays,
+        mdn: originalRental.number, // Request the same MDN
       });
 
-      console.log(`=== TELLABOT RENEW API RESPONSE ===`);
+      console.log(`=== LTR RENEW API RESPONSE ===`);
       console.log(`Response:`, result);
 
       if (result.status !== "ok") {
         return res.status(400).json({
           success: false,
           message: result.message || "Renewal request failed",
-          tellabot: {
-            request: { cmd: "request", service: originalOrder.service, mdn: originalOrder.number },
+          ltrApiResponse: {
+            request: { 
+              cmd: "ltr_rent", 
+              service: originalRental.service, 
+              duration: durationInDays,
+              mdn: originalRental.number 
+            },
             response: result,
           },
         });
       }
 
       // Deduct balance from user
-      user.balance -= originalOrder.amount;
+      user.balance -= originalRental.price;
       await user.save();
 
-      // Create new order for renewal with data from Tellabot response
-      const renewalData = result.message[0]; // Get the first (and usually only) response
+      // Get renewal data from API response
+      const renewalData = result.message;
       
-      const renewedOrder = new Order({
+      // Calculate new expiry date (extend from current date or current expiry, whichever is later)
+      const now = new Date();
+      const currentExpiry = new Date(originalRental.expiresAt);
+      const baseDate = currentExpiry > now ? currentExpiry : now;
+      const newExpiryDate = new Date(baseDate.getTime() + (durationInDays * 24 * 60 * 60 * 1000));
+
+      // Create new rental for the renewal with extended expiry
+      const renewedRental = new Rental({
         userId: userId,
-        service: originalOrder.service,
-        state: originalOrder.state || "US",
-        amount: originalOrder.amount,
-        number: renewalData.mdn || originalOrder.number, // Use new MDN or keep original
-        status: "pending",
-        transactionId: renewalData.id, // Store Tellabot transaction ID
-        expiresAt: new Date(Date.now() + (renewalData.till_expiration || 1800) * 1000), // 30 min default
-        createdAt: new Date(),
+        service: originalRental.service,
+        state: originalRental.state || "US",
+        duration: originalRental.duration,
+        number: renewalData.mdn || originalRental.number,
+        transactionId: renewalData.id, // Store LTR transaction ID
+        startDate: new Date(),
+        expiresAt: newExpiryDate,
+        status: "active",
+        price: originalRental.price,
+        actions: {
+          hotspot: false,
+          dislike: false,
+          addToCart: false,
+        },
         isRenewal: true,
-        originalOrderId: originalOrder._id,
+        originalRentalId: originalRental._id,
       });
 
-      await renewedOrder.save();
+      await renewedRental.save();
 
-      console.log(`=== RENEWAL ORDER CREATED ===`);
-      console.log(`New Order ID: ${renewedOrder._id}`);
-      console.log(`Renewed Order:`, {
-        id: renewedOrder._id,
-        service: renewedOrder.service,
-        number: renewedOrder.number,
-        amount: renewedOrder.amount,
-        status: renewedOrder.status,
-        isRenewal: renewedOrder.isRenewal,
+      console.log(`=== RENEWAL CREATED ===`);
+      console.log(`New Rental ID: ${renewedRental._id}`);
+      console.log(`Extended Expiry: ${newExpiryDate}`);
+      console.log(`Renewed Rental:`, {
+        id: renewedRental._id,
+        service: renewedRental.service,
+        number: renewedRental.number,
+        price: renewedRental.price,
+        status: renewedRental.status,
+        isRenewal: renewedRental.isRenewal,
+        expiresAt: renewedRental.expiresAt,
       });
 
       res.json({
         success: true,
-        message: `Order renewed successfully! Reusing number ${renewedOrder.number} for ${originalOrder.service}`,
-        order: {
-          id: renewedOrder._id,
-          service: renewedOrder.service,
-          state: renewedOrder.state,
-          price: renewedOrder.amount,
-          amount: renewedOrder.amount,
-          number: renewedOrder.number,
-          status: renewedOrder.status,
+        message: `Rental renewed successfully! Extended ${originalRental.number} for ${durationInDays} more days`,
+        rental: {
+          id: renewedRental._id,
+          service: renewedRental.service,
+          state: renewedRental.state,
+          duration: renewedRental.duration,
+          price: renewedRental.price,
+          number: renewedRental.number,
+          status: renewedRental.status,
+          startDate: renewedRental.startDate,
+          expiresAt: renewedRental.expiresAt,
           isRenewal: true,
-          originalOrderId: originalOrder._id,
-          transactionId: renewedOrder.transactionId,
-          expiresAt: renewedOrder.expiresAt,
+          originalRentalId: originalRental._id,
+          transactionId: renewedRental.transactionId,
         },
         newBalance: user.balance,
-        tellabot: {
-          request: { cmd: "request", service: originalOrder.service, mdn: originalOrder.number },
+        extensionDetails: {
+          previousExpiry: originalRental.expiresAt,
+          newExpiry: newExpiryDate,
+          daysExtended: durationInDays,
+        },
+        ltrApiResponse: {
+          request: { 
+            cmd: "ltr_rent", 
+            service: originalRental.service, 
+            duration: durationInDays,
+            mdn: originalRental.number 
+          },
           response: result,
         },
       });
     } catch (error) {
-      console.error("Renew order error:", error);
+      console.error("Renew LTR error:", error);
       res.status(500).json({
         success: false,
-        message: error.message || "Failed to renew order",
+        message: error.message || "Failed to renew rental",
         error: error.toString(),
       });
     }

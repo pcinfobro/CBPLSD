@@ -1,9 +1,16 @@
+<% 
+// Prevent undefined errors for all main template variables
+var stats = typeof stats !== 'undefined' ? stats : {};
+var news = typeof news !== 'undefined' ? news : [];
+var user = typeof user !== 'undefined' ? user : null;
+%>
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CodeByPass - Dashboard</title>
+    <link rel="icon" href="/assets/images/codebypass-logo/codebypass-icon-white-bg.png">
     <!-- Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
@@ -1729,19 +1736,19 @@
       <!-- Sidebar -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-          <a href="/user/index" class="logo">
+          <a href="/user/dashboard" class="logo">
             <div class="logo-container">
               <div class="logo-icon">
-                <img
-                  src="/assets/images/codebypass-logo/codebypass-icon-white-bg.png"
-                  alt="CodeByPass Icon"
-                />
-              </div>
-              <img
-                src="/assets/images/codebypass-logo/codebypass-logo-white-text-bg.png"
-                alt="CodeByPass"
-                class="logo-text"
+                              <img
+                                              src="/assets/images/codebypass-logo/codebypass-logo-white-text-bg.png"
+                alt="CodeByPass Icon"
               />
+              </div>
+                             <img
+                 src="/assets/images/codebypass-logo/codebypass-logo-white-text-bg.png"
+                 alt="CodeByPass"
+                 class="logo-text"
+               />
             </div>
           </a>
         </div>
@@ -1749,7 +1756,7 @@
         <div class="sidebar-menu">
           <ul>
             <li class="menu-item">
-              <a href="/user/index" class="menu-link active">
+              <a href="/user/dashboard" class="menu-link active">
                 <span class="menu-icon"><i class="fas fa-th-large"></i></span>
                 <span class="menu-text">Dashboard</span>
               </a>
@@ -1825,11 +1832,11 @@
 
             <div class="user-dropdown" id="userDropdown">
               <div class="header-avatar">
-                <%= user.username.charAt(0).toUpperCase() %>
+                <%= user ? user.username.charAt(0).toUpperCase() : '' %>
               </div>
               <div class="header-user-info">
-                <div class="header-user-name"><%= user.username %></div>
-                <div class="header-user-role"><%= user.role %></div>
+                <div class="header-user-name"><%= user ? user.username : '' %></div>
+                <div class="header-user-role"><%= user ? user.role : '' %></div>
               </div>
               <i class="fas fa-chevron-down"></i>
 
@@ -1837,8 +1844,8 @@
               <div class="dropdown-menu" id="dropdownMenu">
                 <div class="dropdown-header">
                   <div class="dropdown-user-info">
-                    <div class="dropdown-user-name"><%= user.username %></div>
-                    <div class="dropdown-user-email"><%= user.email %></div>
+                    <div class="dropdown-user-name"><%= user ? user.username : '' %></div>
+                    <div class="dropdown-user-email"><%= user ? user.email : '' %></div>
                   </div>
                 </div>
                 <div class="dropdown-body">
@@ -1866,7 +1873,7 @@
         <main class="content">
           <div class="section-header">
             <h2 class="section-title">Dashboard</h2>
-            <p class="section-subtitle">Welcome back, <%= user.username %>.</p>
+            <p class="section-subtitle">Welcome back, <%= user ? user.username : '' %>.</p>
           </div>
 
           <div class="stats-grid">
@@ -1876,7 +1883,7 @@
               </div>
               <div class="stat-content">
                 <div class="stat-value" id="totalOrders">
-                  <%= stats.totalOrders %>
+                  <%= stats ? stats.totalOrders : '' %>
                 </div>
                 <div class="stat-label">Total Orders</div>
               </div>
@@ -1888,7 +1895,7 @@
               </div>
               <div class="stat-content">
                 <div class="stat-value" id="successOrders">
-                  <%= stats.successOrders %>
+                  <%= stats ? stats.successOrders : '' %>
                 </div>
                 <div class="stat-label">Success Orders</div>
               </div>
@@ -1900,7 +1907,7 @@
               </div>
               <div class="stat-content">
                 <div class="stat-value" id="totalRent">
-                  <%= stats.totalRentals %>
+                  <%= stats ? stats.totalRentals : '' %>
                 </div>
                 <div class="stat-label">Total Rent</div>
               </div>
@@ -1912,7 +1919,7 @@
               </div>
               <div class="stat-content">
                 <div class="stat-value" id="activeRent">
-                  <%= stats.activeRentals %>
+                  <%= stats ? stats.activeRentals : '' %>
                 </div>
                 <div class="stat-label">Active Rent</div>
               </div>
@@ -2130,12 +2137,39 @@
           .catch((err) => console.error("Error refreshing balance:", err));
       }
 
-      // Refresh balance when page loads
-      document.addEventListener("DOMContentLoaded", function () {
-        refreshBalance();
+      // Interval management helpers to avoid duplicates piling up
+      function startBalanceInterval() {
+        if (!window.balanceRefreshInterval) {
+          window.balanceRefreshInterval = setInterval('balance-refresh', refreshBalance, 30000);
+        }
+      }
 
-        // Set up periodic balance refresh (every 30 seconds)
-        setInterval(refreshBalance, 30000);
+      function stopBalanceInterval() {
+        if (window.balanceRefreshInterval) {
+          clearInterval('balanceRefresh');
+          window.balanceRefreshInterval = null;
+        }
+      }
+
+      // Refresh balance when page loads and start interval safely
+      document.addEventListener("DOMContentLoaded", function () {
+        stopBalanceInterval();
+        refreshBalance();
+        startBalanceInterval();
+      });
+
+      // Cleanup on page unload and handle tab visibility to reduce load
+      window.addEventListener('page-hidden', () => {
+                        window.intervalManager.clearAll();
+                    });
+                    window.addEventListener('beforeunload', stopBalanceInterval);
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) {
+          stopBalanceInterval();
+        } else {
+          startBalanceInterval();
+          refreshBalance();
+        }
       });
 
       // Update the logout functionality to clear interval
@@ -2144,12 +2178,9 @@
         .addEventListener("click", function (e) {
           e.preventDefault();
           // Clear any intervals before logging out
-          clearInterval(balanceRefreshInterval);
+          stopBalanceInterval();
           window.location.href = "/user/signout";
         });
-
-      // Store the interval ID for cleanup
-      let balanceRefreshInterval = setInterval(refreshBalance, 30000);
     </script>
   </body>
 </html>

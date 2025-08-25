@@ -688,7 +688,7 @@ p {
   background: var(--white);
   border-radius: var(--border-radius-md);
   box-shadow: var(--shadow-sm);
-  overflow: hidden;
+  overflow: visible;
   transition: var(--transition);
   border: 1px solid var(--gray-100);
 }
@@ -949,6 +949,40 @@ p {
   color: var(--danger);
 }
 
+.badge-info {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--info);
+}
+
+.badge-secondary {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: var(--gray-600);
+}
+
+/* Date and Time Styling */
+.date-text {
+  font-weight: 500;
+  color: var(--gray-800);
+  font-size: 0.875rem;
+}
+
+.time-text {
+  color: var(--gray-500);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+/* User Badge */
+.user-badge {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: var(--white);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: 50px;
+  display: inline-block;
+}
+
 /* Duration Badges */
 .duration-3days {
   background: var(--info);
@@ -1119,6 +1153,21 @@ p {
   to { transform: rotate(360deg); }
 }
 
+/* Details panel under each rental row */
+.details-row td { background: #fafafa; }
+.details-panel { padding: 1rem 1rem 1.25rem 1rem; border-top: 1px dashed var(--gray-200); }
+.details-section { margin-top: 0.5rem; }
+.details-header { font-weight: 600; color: var(--secondary); display:flex; align-items:center; }
+.details-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); gap: 0.75rem; margin-top: 0.5rem; }
+.muted { color: var(--gray-600); font-size: 0.875rem; }
+.kv { font-weight: 600; color: var(--secondary); margin-top: 4px; }
+.pin-row { display:flex; align-items:center; gap: 0.5rem; margin-top: 0.5rem; }
+.pin-box { font-family: "Courier New", monospace; font-size: 1.25rem; letter-spacing: 2px; padding: 0.25rem 0.5rem; background: #fff; border: 1px solid var(--gray-200); border-radius: 6px; min-width: 110px; text-align: center; }
+.messages-list { display:flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.message-item { background:#fff; border:1px solid var(--gray-100); border-radius: 6px; padding: 0.5rem 0.75rem; }
+.message-meta { color: var(--gray-500); font-size: 0.75rem; margin-bottom: 0.25rem; }
+.message-text { white-space: pre-wrap; color: var(--gray-700); }
+
 /* User Dropdown Menu */
 .dropdown-menu {
   position: absolute;
@@ -1261,6 +1310,13 @@ p {
   opacity: 1 !important;
   visibility: visible !important;
   transform: translateY(0) !important;
+}
+
+.searchable-dropdown .dropdown-menu:not(.show) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateY(-10px) !important;
 }
 
 .search-box {
@@ -1653,5 +1709,82 @@ p {
   .form-control,
   .form-select {
     font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+}
+
+/* Lottie Animation Styles */
+.lottie-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.lottie-container lottie-player {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease;
+}
+
+.lottie-container:hover lottie-player {
+  transform: scale(1.05);
+}
+
+.table-empty .lottie-container {
+  padding: 20px;
+}
+
+.table-empty .lottie-container lottie-player {
+  width: 200px !important;
+  height: 200px !important;
+}
+
+.option .lottie-container {
+  padding: 15px;
+}
+
+.option .lottie-container lottie-player {
+  width: 120px !important;
+  height: 120px !important;
+}
+
+/* Responsive Lottie animations */
+@media (max-width: 768px) {
+  .lottie-container lottie-player {
+    width: 120px !important;
+    height: 120px !important;
+  }
+  
+  .table-empty .lottie-container lottie-player {
+    width: 160px !important;
+    height: 160px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .lottie-container lottie-player {
+    width: 100px !important;
+    height: 100px !important;
+  }
+  
+  .table-empty .lottie-player {
+    width: 140px !important;
+    height: 140px !important;
+  }
+}
+
+/* Loading animation entrance effect */
+.lottie-container {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="assets/images/codebypass-logo/codebypass-icon-white-bg.png">
+<link rel="icon" href="/assets/images/codebypass-logo/codebypass-icon-white-bg.png">
 <!-- reCAPTCHA script -->
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <style>
@@ -631,7 +631,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: url("/assets/images/login-sign-up-bg-codebypass.jpeg");
+        background-image: url("/assets/images/login-register-codebypass.jpg");
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
@@ -1008,10 +1008,10 @@
 <body>
     <!-- Header -->
     <header>
-        <div class="container header-container">
-        <a href="/" class="logo">
-            <img src="/assets/images/codebypass-logo/codebypass-logo-full-transparent-black-text.png" alt="CodeByPass">
-        </a>           
+                    <div class="container header-container">
+            <a href="/" class="logo">
+                <img src="/assets/images/codebypass-logo/codebypass-logo-full-transparent-black-text.png" alt="CodeByPass">
+            </a>           
             <div class="nav-container">
                 <nav class="main-nav">
                     <ul>
@@ -1024,8 +1024,8 @@
                 </nav>
                 
                 <div class="auth-nav">
-                    <a href="/user/signin" class="btn btn-secondary">Login</a>
-                    <a href="/user/signup" class="btn">Register</a>
+                    <a href="/user/login" class="btn btn-secondary">Login</a>
+                    <a href="/user/register" class="btn">Register</a>
                 </div>
             </div>
             
@@ -1055,14 +1055,16 @@
         <div class="mobile-nav-divider"></div>
         
         <div class="mobile-nav-auth">
-            <a href="/user/signin" class="btn btn-secondary">Login</a>
-            <a href="/user/signup" class="btn">Register</a>
+            <a href="/user/login" class="btn btn-secondary">Login</a>
+            <a href="/user/register" class="btn">Register</a>
         </div>
         
         <div class="mobile-nav-social">
-            <a href="#"><i class="fab fa-whatsapp"></i></a>
-            <a href="#"><i class="fab fa-telegram"></i></a>
-            <a href="#"><i class="fab fa-discord"></i></a>
+            <a href="https://t.me/codebypassapp" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram"></i></a>
+            <a href="https://www.youtube.com/@codebypassapp" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
+            <a href="https://www.facebook.com/codebypassapp" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.tiktok.com/@codebypassapp" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
+            <a href="https://x.com/codebypassapp" target="_blank" rel="noopener noreferrer"><i class="fab fa-x-twitter"></i></a>
         </div>
     </nav>
     
@@ -1097,7 +1099,7 @@
                         
                         <div class="divider">OR</div>
                         
-                        <form class="login-form" id="loginForm" action="/user/signin" method="POST">
+                        <form class="login-form" id="loginForm" action="/user/login" method="POST">
                             <div class="form-group">
                                 <label for="email">Email Address</label>
                                 <div class="input-wrapper">
@@ -1124,12 +1126,12 @@
                                     <input type="checkbox" id="rememberMe" name="rememberMe">
                                     <label for="rememberMe">Remember me</label>
                                 </div>
-                                <a href="/user/forgot-password" class="forgot-password">Forgot password?</a>
+                                <a href="https://app.codebypass.com/user/forgot-password" class="forgot-password">Forgot password?</a>
                             </div>
                             
                             <!-- reCAPTCHA -->
                             <div class="recaptcha-container">
-                                <div class="g-recaptcha" data-sitekey="6LcmRHQpAAAAAKox1CmxwgV0Cbh03cU1MTc4si2g"></div>
+                                <div class="g-recaptcha" data-sitekey="<%= process.env.RECAPTCHA_SITE_KEY %>"></div>
                             </div>
                             
                             <button type="submit" class="btn form-submit">
@@ -1137,7 +1139,7 @@
                             </button>
                             
                             <div class="form-footer">
-                                Don't have an account? <a href="/user/signup">Sign up here</a>
+                                Don't have an account? <a href="/user/register">Sign up here</a>
                             </div>
                         </form>
                     </div>
@@ -1151,33 +1153,35 @@
         <div class="container footer-container">
             <div class="footer-top">
                 <div>
-                    <div class="footer-logo">
-                        <img src="/assets/images/codebypass-logo/codebypass-logo-full-transparent-black-text.png" alt="CodeByPass">
-                    </div>
+                                    <div class="footer-logo">
+                    <img src="/assets/images/codebypass-logo/codebypass-logo-full-transparent-black-text.png" alt="CodeByPass">
+                </div>
                     <p class="footer-about">CodeByPass is your trusted partner for SMS verification services. We provide reliable, secure phone numbers for all your verification needs, protecting your privacy online.</p>
                     <div class="footer-social">
-                        <a href="#" class="footer-social-link"><i class="fab fa-whatsapp"></i></a>
-                        <a href="#" class="footer-social-link"><i class="fab fa-telegram"></i></a>
-                        <a href="#" class="footer-social-link"><i class="fab fa-discord"></i></a>
+                        <a href="https://t.me/codebypassapp" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram"></i></a>
+                        <a href="https://www.youtube.com/@codebypassapp" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.facebook.com/codebypassapp" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.tiktok.com/@codebypassapp" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
+                        <a href="https://x.com/codebypassapp" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-x-twitter"></i></a>
                     </div>
                 </div>
                 
                 <div>
                     <h3 class="footer-heading">Services</h3>
                     <ul class="footer-links">
-                        <li><a href="pricing.html"><i class="fas fa-chevron-right"></i> SMS Verifications</a></li>
-                        <li><a href="pricing.html"><i class="fas fa-chevron-right"></i> Number Rentals</a></li>
-                        <li><a href="pricing.html"><i class="fas fa-chevron-right"></i> API Access</a></li>
+                        <li><a href="/pricing"><i class="fas fa-chevron-right"></i> SMS Verifications</a></li>
+                        <li><a href="/pricing"><i class="fas fa-chevron-right"></i> Number Rentals</a></li>
+                        <li><a href="/pricing"><i class="fas fa-chevron-right"></i> API Access</a></li>
                     </ul>
                 </div>
                 
                 <div>
                     <h3 class="footer-heading">Company</h3>
                     <ul class="footer-links">
-                        <li><a href="about.html"><i class="fas fa-chevron-right"></i> About Us</a></li>
-                        <li><a href="privacy.html"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
-                        <li><a href="terms.html"><i class="fas fa-chevron-right"></i> Terms of Service</a></li>
-                        <li><a href="faq.html"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+                        <li><a href="/about"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                        <li><a href="/privacy"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+                        <li><a href="/terms"><i class="fas fa-chevron-right"></i> Terms of Service</a></li>
+                        <li><a href="/faq"><i class="fas fa-chevron-right"></i> FAQ</a></li>
                     </ul>
                 </div>
                 
@@ -1238,11 +1242,14 @@
             }
         });
         
-        // Form Validation
+        // Simple form submission - back to basics
         const loginForm = document.getElementById('loginForm');
         
+        console.log('JavaScript loaded - form found:', !!loginForm);
+        
+        // NO event prevention - let form submit naturally
         loginForm.addEventListener('submit', function(event) {
-            event.preventDefault();
+            console.log('Form submit event triggered');
             
             let isValid = true;
             
@@ -1261,6 +1268,7 @@
             const email = document.getElementById('email');
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!email.value.trim() || !emailRegex.test(email.value.trim())) {
+                console.log('Email validation failed');
                 document.getElementById('emailError').classList.add('visible');
                 email.classList.add('error');
                 isValid = false;
@@ -1269,6 +1277,7 @@
             // Validate Password
             const password = document.getElementById('password');
             if (!password.value.trim()) {
+                console.log('Password validation failed');
                 document.getElementById('passwordError').classList.add('visible');
                 password.classList.add('error');
                 isValid = false;
@@ -1277,22 +1286,28 @@
             // Validate reCAPTCHA
             const recaptchaResponse = grecaptcha.getResponse();
             if (!recaptchaResponse) {
+                console.log('reCAPTCHA validation failed');
                 alert('Please complete the reCAPTCHA verification');
                 isValid = false;
             }
             
-            if (isValid) {
-                // Set session duration based on Remember Me checkbox
-                const rememberMeCheckbox = document.getElementById('rememberMe');
-                const sessionDuration = rememberMeCheckbox.checked ? 24 * 60 * 60 * 1000 : 5 * 60 * 60 * 1000; // 24 hours or 5 hours in milliseconds
-                const expiryDate = new Date(Date.now() + sessionDuration);
-                
-                // In a real implementation, you would set a cookie or use localStorage with the expiry
-                document.cookie = `sessionToken=user_session_token; expires=${expiryDate.toUTCString()}; path=/`;
-                
-                // Submit the form
-                this.submit();
+            console.log('Validation result:', isValid);
+            console.log('Form data:', {
+                email: email.value,
+                password: password.value ? '[HIDDEN]' : 'empty',
+                recaptcha: recaptchaResponse ? 'present' : 'missing'
+            });
+            
+            // If validation fails, prevent submission
+            if (!isValid) {
+                console.log('Preventing form submission due to validation errors');
+                event.preventDefault();
+                return false;
             }
+            
+            console.log('Form validation passed, allowing natural submission');
+            // Let the form submit naturally - DO NOT prevent default
+            return true;
         });
         // Add this script to your signin.ejs
 document.addEventListener('DOMContentLoaded', function() {

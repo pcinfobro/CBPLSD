@@ -36,7 +36,7 @@ const rentalSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["active", "expired", "cancelled"],
+      enum: ["active", "expired", "cancelled", "rejected"],
       default: "active",
     },
     price: {
@@ -51,6 +51,14 @@ const rentalSchema = new mongoose.Schema(
         addToCart: { type: Boolean, default: false },
       },
       default: {},
+    },
+    isRenewal: {
+      type: Boolean,
+      default: false,
+    },
+    originalRentalId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Rental",
     },
   },
   { timestamps: true }

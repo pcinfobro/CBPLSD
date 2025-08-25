@@ -14,6 +14,8 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <!-- Lottie Player -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <!-- Custom CSS -->
     <style>
       /* Color System */
@@ -768,6 +770,12 @@
         align-items: center;
         justify-content: space-between;
         background: linear-gradient(to right, var(--white), var(--gray-50));
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
 
       .card-title {
@@ -1722,6 +1730,74 @@
         }
       }
 
+      /* Lottie Animation Styles */
+      .lottie-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .lottie-container lottie-player {
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        transition: transform 0.3s ease;
+      }
+
+      .lottie-container:hover lottie-player {
+        transform: scale(1.05);
+      }
+
+      .dropdown-empty .lottie-container {
+        padding: 15px;
+      }
+
+      .dropdown-empty .lottie-container lottie-player {
+        width: 160px !important;
+        height: 160px !important;
+      }
+
+      /* Responsive Lottie animations */
+      @media (max-width: 768px) {
+        .lottie-container lottie-player {
+          width: 120px !important;
+          height: 120px !important;
+        }
+        
+        .table-empty .lottie-container lottie-player {
+          width: 160px !important;
+          height: 160px !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .lottie-container lottie-player {
+          width: 100px !important;
+          height: 100px !important;
+        }
+        
+        .table-empty .lottie-container lottie-player {
+          width: 140px !important;
+          height: 140px !important;
+        }
+      }
+
+      /* Loading animation entrance effect */
+      .lottie-container {
+        animation: fadeInUp 0.5s ease-out;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
       /* History Tab Content */
       .history-tab-content {
         display: none;
@@ -2207,16 +2283,16 @@
       <!-- Sidebar -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-          <a href="/user/index" class="logo">
+                          <a href="/user/dashboard" class="logo">
             <div class="logo-container">
               <div class="logo-icon">
                 <img
-                  src="/assets/images/codebypass-logo/codebypass-icon-white-bg.png"
+                  src="/assets/images/codebypass-logo/codebypass-logo-white-text-bg.png"
                   alt="CodeByPass Icon"
                 />
               </div>
               <img
-                src="  /assets/images/codebypass-logo/codebypass-logo-white-text-bg.png"
+                src="/assets/images/codebypass-logo/codebypass-logo-white-text-bg.png"
                 alt="CodeByPass"
                 class="logo-text"
               />
@@ -2227,7 +2303,7 @@
         <div class="sidebar-menu">
           <ul>
             <li class="menu-item">
-              <a href="/user/index" class="menu-link">
+                                  <a href="/user/dashboard" class="menu-link">
                 <span class="menu-icon"><i class="fas fa-th-large"></i></span>
                 <span class="menu-text">Dashboard</span>
               </a>
@@ -2519,6 +2595,14 @@
           <div class="card">
             <div class="card-header">
               <h3 class="card-title"><i class="fas fa-sms"></i> SMS Details</h3>
+              <div class="header-actions">
+                <span id="pendingCounter" class="badge badge-info" style="margin-right: 10px; display: none;">
+                  <i class="fas fa-clock"></i> <span id="pendingCount">0</span> pending
+                </span>
+                <button class="btn btn-outline btn-sm" onclick="forceRefreshOrders()">
+                  <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+              </div>
             </div>
             <div class="card-body">
               <div class="search-container">
@@ -2537,6 +2621,7 @@
                     <option value="pending">Pending</option>
                     <option value="completed">Completed</option>
                     <option value="failed">Failed</option>
+                    <option value="rejected">Rejected</option>
                     <option value="expired">Expired</option>
                   </select>
                 </div>
@@ -2567,7 +2652,20 @@
                     </tr>
                   </thead>
                   <tbody id="ordersTableBody">
-                    <!-- This will be populated by JavaScript -->
+                    <tr>
+                      <td colspan="8" class="table-empty">
+                        <div class="lottie-container" style="text-align: center; padding: 20px;">
+                          <lottie-player
+                            src="/assets/animations/Loading search glass.json"
+                            background="transparent"
+                            speed="1"
+                            style="width: 200px; height: 200px; margin: 0 auto;"
+                            loop
+                            autoplay>
+                          </lottie-player>
+                        </div>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -2584,6 +2682,8 @@
       let selectedService = null;
       let selectedServiceData = null;
       let balanceRefreshInterval;
+      let smsCheckInterval;
+      let isLoadingOrders = false;
 
       // DOM Elements
       const sidebar = document.getElementById("sidebar");
@@ -2749,19 +2849,19 @@
           refreshBalance();
 
           // Set up periodic refresh for balance
-          balanceRefreshInterval = setInterval(refreshBalance, 30000);
+          balanceRefreshInterval = setInterval('balance-refresh', refreshBalance, 30000);
 
           // Start auto-checking for SMS messages on pending orders
           startAutoSMSCheck();
 
-          // Add less frequent refresh for new orders (every 60 seconds)
+          // Add frequent refresh for new orders - IMPROVED TIMING
           setInterval(async () => {
             try {
               await loadExistingOrders();
             } catch (error) {
               console.log("Auto-refresh orders failed:", error.message);
             }
-          }, 60000); // Refresh orders every 60 seconds instead of 10
+          }, 30000); // Reduced from 60000ms to 30000ms for more frequent updates
 
           } catch (error) {
           console.error("Error during page initialization:", error);
@@ -2914,8 +3014,17 @@
           if (serviceOptions) {
             serviceOptions.innerHTML = `
               <div class="dropdown-empty">
-                <i class="fas fa-spinner fa-spin"></i>
-                <div>Loading services...</div>
+                <div class="lottie-container">
+                  <lottie-player
+                    src="/assets/animations/Loading search glass.json"
+                    background="transparent"
+                    speed="1"
+                    style="width: 160px; height: 160px; margin: 0 auto;"
+                    loop
+                    autoplay>
+                  </lottie-player>
+                </div>
+
               </div>
             `;
           }
@@ -3014,8 +3123,12 @@
           });
 
           if (response.success) {
-            showAlert("Number purchased successfully!", "success");
+            showAlert("Number purchased successfully! Checking for SMS updates...", "success");
             await loadExistingOrders();
+            if (response.order && response.order.id) {
+              showAlert("Starting rapid SMS check - this will continue automatically until SMS arrives!", "info");
+              rapidCheckSMS(response.order.id);
+            }
             refreshBalance();
 
             // Reset form
@@ -3166,6 +3279,33 @@
 
       // Load existing orders when page loads
       async function loadExistingOrders() {
+        if (isLoadingOrders) {
+          console.log('Skipping loadExistingOrders; already loading.');
+          return;
+        }
+        isLoadingOrders = true;
+        
+        // Show loading state
+        const tbody = document.querySelector("#ordersTableBody");
+        if (tbody) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="8" class="table-empty">
+                <div class="lottie-container" style="text-align: center; padding: 20px;">
+                  <lottie-player
+                    src="/assets/animations/Loading search glass.json"
+                    background="transparent"
+                    speed="1"
+                    style="width: 200px; height: 200px; margin: 0 auto;"
+                    loop
+                    autoplay>
+                  </lottie-player>
+                </div>
+              </td>
+            </tr>
+          `;
+        }
+        
         try {
           const response = await makeAPICall("/user/api/orders");
           if (response.success) {
@@ -3187,19 +3327,111 @@
           if (tbody) {
             tbody.innerHTML = `
               <tr>
-                <td colspan="8" class="table-empty">Failed to load orders. Please refresh the page.</td>
+                <td colspan="8" class="table-empty">
+                  <div style="text-align: center; padding: 40px 20px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                    <div style="color: var(--gray-500); font-size: 1rem; margin-bottom: 0.5rem;">Failed to load orders</div>
+                    <div style="color: var(--gray-400); font-size: 0.875rem;">Please refresh the page or try again later</div>
+                    <button onclick="loadExistingOrders()" class="btn btn-outline" style="margin-top: 1rem;">
+                      <i class="fas fa-redo"></i> Retry
+                    </button>
+                  </div>
+                </td>
               </tr>
             `;
+          }
+        } finally { isLoadingOrders = false; }
+      }
+
+      // Manual refresh for S1 orders - ENHANCED
+      async function forceRefreshOrders() {
+        const refreshBtn = document.querySelector('button[onclick="forceRefreshOrders()"]');
+        const icon = refreshBtn?.querySelector('i');
+        
+        if (refreshBtn) refreshBtn.disabled = true;
+        if (icon) {
+          icon.classList.remove('fa-sync-alt');
+          icon.classList.add('fa-spinner', 'fa-spin');
+        }
+        
+        showAlert('Force refreshing all orders and checking pending SMS...', 'info');
+        
+        try {
+          // First reload all orders
+          await loadExistingOrders();
+          
+          // Then force check all pending orders immediately
+          const pendingRows = document.querySelectorAll("tr[data-order-id] .badge-warning");
+          
+          if (pendingRows.length > 0) {
+            showAlert(`Checking ${pendingRows.length} pending orders for SMS updates...`, 'info');
+            
+            const checkPromises = [];
+            
+            for (const statusBadge of pendingRows) {
+              const orderRow = statusBadge.closest("tr");
+              const orderId = orderRow.getAttribute("data-order-id");
+              
+              if (orderId) {
+                // Create a promise for each order check
+                const checkPromise = (async () => {
+                  try {
+                    console.log(`Force checking order: ${orderId}`);
+                    
+                    // Check SMS first
+                    const smsResult = await makeAPICall(`/user/api/check-sms/${orderId}`, { method: 'GET' });
+                    if (smsResult.success && smsResult.order) {
+                      updateSingleOrderRow(orderId, smsResult.order);
+                      if (smsResult.order.status === 'completed') {
+                        return;
+                      }
+                    }
+                    
+                    // Check status
+                    const statusResult = await makeAPICall(`/user/api/request-status/${orderId}`, { method: 'GET' });
+                    if (statusResult.success && statusResult.order) {
+                      updateSingleOrderRow(orderId, statusResult.order);
+                    }
+                  } catch (error) {
+                    console.log(`Force check failed for order ${orderId}:`, error.message);
+                  }
+                })();
+                
+                checkPromises.push(checkPromise);
+              }
+            }
+            
+            // Wait for all checks to complete
+            await Promise.allSettled(checkPromises);
+            showAlert('Force refresh completed!', 'success');
+          } else {
+            showAlert('No pending orders to check!', 'info');
+          }
+          
+        } catch (error) {
+          showAlert('Force refresh failed: ' + error.message, 'error');
+        } finally {
+          refreshBalance();
+          
+          if (refreshBtn) refreshBtn.disabled = false;
+          if (icon) {
+            icon.classList.remove('fa-spinner', 'fa-spin');
+            icon.classList.add('fa-sync-alt');
           }
         }
       }
 
-      // Auto-refresh function for pending orders
+      // Auto-refresh function for pending orders - IMPROVED TIMING
       function startAutoSMSCheck() {
-        setInterval(async () => {
+        if (smsCheckInterval) clearInterval('smsCheck');
+        
+        smsCheckInterval = setInterval(async () => {
           const pendingRows = document.querySelectorAll(
             "tr[data-order-id] .badge-warning"
           );
+
+          // Update pending counter
+          updatePendingCounter(pendingRows.length);
 
           for (const statusBadge of pendingRows) {
             const orderRow = statusBadge.closest("tr");
@@ -3207,9 +3439,25 @@
 
             if (orderId) {
               console.log("Auto-checking SMS for pending order:", orderId);
-              // Silently check without user alerts
+              
               try {
-                // First check request status
+                // For efficiency, check SMS directly first (most likely to have updates)
+                const smsResult = await makeAPICall(
+                  `/user/api/check-sms/${orderId}`,
+                  {
+                    method: "GET",
+                  }
+                );
+
+                if (smsResult.success && smsResult.order) {
+                  updateSingleOrderRow(orderId, smsResult.order);
+                  // If completed, no need to check status
+                  if (smsResult.order.status === 'completed') {
+                    continue;
+                  }
+                }
+
+                // Only check status if SMS didn't complete the order
                 const statusResult = await makeAPICall(
                   `/user/api/request-status/${orderId}`,
                   {
@@ -3220,18 +3468,7 @@
                 if (statusResult.success && statusResult.order) {
                   updateSingleOrderRow(orderId, statusResult.order);
                 }
-
-                // Then check for SMS
-                const smsResult = await makeAPICall(
-                  `/user/api/check-sms/${orderId}`,
-                  {
-                    method: "GET",
-                  }
-                );
-
-                if (smsResult.success && smsResult.order) {
-                  updateSingleOrderRow(orderId, smsResult.order);
-                }
+                
               } catch (error) {
                 console.log(
                   "Auto-check failed for order:",
@@ -3241,7 +3478,101 @@
               }
             }
           }
-        }, 30000); // Check every 30 seconds for pending orders (reduced from 15)
+        }, 3000); // Reduced from 5000ms to 3000ms for faster updates
+      }
+
+      // Update pending orders counter
+      function updatePendingCounter(count) {
+        const counter = document.getElementById('pendingCounter');
+        const countSpan = document.getElementById('pendingCount');
+        
+        if (counter && countSpan) {
+          countSpan.textContent = count;
+          if (count > 0) {
+            counter.style.display = 'inline-block';
+            counter.className = 'badge badge-warning';
+          } else {
+            counter.style.display = 'none';
+          }
+        }
+      }
+
+      // Enhanced rapid checker for new orders - MUCH MORE AGGRESSIVE
+      async function rapidCheckSMS(orderId) {
+        console.log(`Starting rapid check for order: ${orderId}`);
+        
+        // Add visual indicator
+        const orderRow = document.querySelector(`tr[data-order-id="${orderId}"]`);
+        let statusCell = null;
+        if (orderRow) {
+          statusCell = orderRow.querySelector('td[data-label="Status"] .badge');
+          if (statusCell && statusCell.textContent.toLowerCase() === 'pending') {
+            statusCell.innerHTML = 'Checking... <i class="fas fa-spinner fa-spin"></i>';
+          }
+        }
+        
+        try {
+          // Phase 1: Very aggressive checking for first minute (every 2 seconds)
+          for (let attempt = 0; attempt < 30; attempt++) {
+            try {
+              console.log(`Rapid check attempt ${attempt + 1}/30 for order ${orderId}`);
+              
+              // Check SMS first (more likely to have updates)
+              const smsResult = await makeAPICall(`/user/api/check-sms/${orderId}`, { method: 'GET' });
+              if (smsResult.success && smsResult.order) {
+                updateSingleOrderRow(orderId, smsResult.order);
+                if (smsResult.order.status === 'completed') {
+                  console.log(`Order ${orderId} completed in rapid check!`);
+                  return;
+                }
+              }
+              
+              // Check status
+              const statusResult = await makeAPICall(`/user/api/request-status/${orderId}`, { method: 'GET' });
+              if (statusResult.success && statusResult.order) {
+                updateSingleOrderRow(orderId, statusResult.order);
+                if (statusResult.order.status === 'completed' || statusResult.order.status === 'rejected' || statusResult.order.status === 'expired') {
+                  console.log(`Order ${orderId} status changed to ${statusResult.order.status} in rapid check!`);
+                  return;
+                }
+              }
+            } catch (error) {
+              console.log(`Rapid check attempt ${attempt + 1} failed:`, error.message);
+            }
+            
+            await new Promise((r) => setTimeout(r, 2000)); // Check every 2 seconds
+          }
+          
+          // Phase 2: Medium frequency for next 2 minutes (every 5 seconds)
+          for (let attempt = 0; attempt < 24; attempt++) {
+            try {
+              console.log(`Medium check attempt ${attempt + 1}/24 for order ${orderId}`);
+              
+              const smsResult = await makeAPICall(`/user/api/check-sms/${orderId}`, { method: 'GET' });
+              if (smsResult.success && smsResult.order) {
+                updateSingleOrderRow(orderId, smsResult.order);
+                if (smsResult.order.status === 'completed') {
+                  console.log(`Order ${orderId} completed in medium check!`);
+                  return;
+                }
+              }
+            } catch (error) {
+              console.log(`Medium check attempt ${attempt + 1} failed:`, error.message);
+            }
+            
+            await new Promise((r) => setTimeout(r, 5000)); // Check every 5 seconds
+          }
+          
+          console.log(`Rapid checking finished for order ${orderId} - switching to normal auto-refresh`);
+          
+        } catch (error) {
+          console.error(`Rapid check failed for order ${orderId}:`, error);
+        } finally {
+          // Remove visual indicator
+          if (statusCell && statusCell.innerHTML.includes('Checking...')) {
+            statusCell.innerHTML = 'Pending';
+          }
+        }
       }
 
       function updateOrdersTable(orders) {
@@ -3257,7 +3588,13 @@
         if (orders.length === 0) {
           tbody.innerHTML = `
             <tr>
-              <td colspan="8" class="table-empty">No orders found</td>
+              <td colspan="8" class="table-empty">
+                <div style="text-align: center; padding: 40px 20px;">
+                  <i class="fas fa-inbox" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
+                  <div style="color: var(--gray-500); font-size: 1rem; margin-bottom: 0.5rem;">No orders found</div>
+                  <div style="color: var(--gray-400); font-size: 0.875rem;">Start by placing your first order above</div>
+                </div>
+              </td>
             </tr>
           `;
           return;
@@ -3330,6 +3667,8 @@
                 return "Expired";
               } else if (order.status === "failed") {
                 return "Failed";
+              } else if (order.status === "rejected") {
+                return "Rejected";
               } else if (order.status === "completed") {
                 // For completed orders, if we have apiResponse.pin, show it; otherwise show the message
                 return order.apiResponse?.pin || "API ERROR";
@@ -3361,18 +3700,32 @@
               return null;
             };
 
+            // Helper function to clean message text
+            const cleanMessageText = (text) => {
+              if (!text || typeof text !== 'string') return text;
+              
+              // Remove common unwanted suffixes and prefixes
+              return text
+                .replace(/\s*API\s*Invalid\s*Date\s*$/i, '') // Remove "API Invalid Date" at the end
+                .replace(/\s*API\s*$/i, '') // Remove standalone "API" at the end
+                .replace(/\s*Invalid\s*Date\s*$/i, '') // Remove "Invalid Date" at the end
+                .replace(/\s*\.\s*API\s*Invalid\s*Date\s*$/i, '') // Remove ". API Invalid Date" at the end
+                .replace(/\s*\.\s*API\s*$/i, '') // Remove ". API" at the end
+                .trim(); // Remove leading/trailing whitespace
+            };
+
             // Get the actual message content for display following Tellabot API format
             const getMessageContent = (order) => {
               // For COMPLETED orders, prioritize apiResponse.reply from Tellabot
               if (order.status === "completed" && order.apiResponse?.reply) {
-                return order.apiResponse.reply;
+                return cleanMessageText(order.apiResponse.reply);
               }
 
               // Get message text using the helper function
               const messageText = getMessageText(order);
 
               if (messageText) {
-                return messageText;
+                return cleanMessageText(messageText);
               }
 
               // Status-based messages when no SMS received
@@ -3383,8 +3736,10 @@
                   return "Order expired - no SMS received";
                 case "failed":
                   return "Order failed";
+                case "rejected":
+                  return "Order rejected";
                 case "completed":
-                  return order.apiResponse?.reply || "API ERROR";
+                  return cleanMessageText(order.apiResponse?.reply) || "API ERROR";
                 default:
                   return "No messages yet";
               }
@@ -3414,6 +3769,8 @@
                   ? "success"
                   : order.status === "pending"
                   ? "warning"
+                  : order.status === "rejected"
+                  ? "secondary"
                   : "danger"
               }" data-status="${order.status.toLowerCase()}">
                 ${
@@ -3495,25 +3852,8 @@
                 </button>
                
                 -->
-                 <button class="action-btn renew-btn" onclick="renewOrder('${
-                   order._id || order.id
-                 }')" 
-                        title="Renew Order" data-action="renew">
-                  <i class="fas fa-redo"></i>
-                </button>
-                <button class="action-btn status-btn" onclick="checkRequestStatus('${
-                  order._id || order.id
-                }')" 
-                        title="Check Request Status" data-action="status">
-                  <i class="fas fa-info-circle"></i>
-                </button>
-                <button class="action-btn debug-btn" onclick="debugApiResponse('${
-                  order._id || order.id
-                }')" 
-                        title="Debug API Response" data-action="debug" 
-                        style="background: #6c757d;">
-                  <i class="fas fa-bug"></i>
-                </button>
+ 
+                <!-- Removed Check Request Status and Debug API Response buttons permanently -->
                 ${
                   order.status === "pending"
                     ? `
@@ -3532,6 +3872,10 @@
         `;
           })
           .join("");
+          
+        // Update pending counter after table is updated
+        const pendingCount = orders.filter(order => order.status === 'pending').length;
+        updatePendingCounter(pendingCount);
       }
 
       // Action button functions
@@ -3698,10 +4042,24 @@
         return "N/A";
       }
 
+      // Helper function to clean message text - SHARED UTILITY
+      function cleanMessageText(text) {
+        if (!text || typeof text !== 'string') return text;
+        
+        // Remove common unwanted suffixes and prefixes
+        return text
+          .replace(/\s*API\s*Invalid\s*Date\s*$/i, '') // Remove "API Invalid Date" at the end
+          .replace(/\s*API\s*$/i, '') // Remove standalone "API" at the end
+          .replace(/\s*Invalid\s*Date\s*$/i, '') // Remove "Invalid Date" at the end
+          .replace(/\s*\.\s*API\s*Invalid\s*Date\s*$/i, '') // Remove ". API Invalid Date" at the end
+          .replace(/\s*\.\s*API\s*$/i, '') // Remove ". API" at the end
+          .trim(); // Remove leading/trailing whitespace
+      }
+
       function getMessageFromOrder(order) {
         // Priority 1: For COMPLETED orders, use Tellabot API response fields
         if (order.status === "completed" && order.apiResponse?.reply) {
-          return order.apiResponse.reply;
+          return cleanMessageText(order.apiResponse.reply);
         }
 
         // Priority 2: Other message fields
@@ -3715,7 +4073,7 @@
           (order.sms && order.sms.message) ||
           (order.sms && order.sms.reply);
 
-        if (messageText) return messageText;
+        if (messageText) return cleanMessageText(messageText);
 
         switch (order.status) {
           case "pending":
@@ -3725,7 +4083,7 @@
           case "failed":
             return "Order failed";
           case "completed":
-            return order.apiResponse?.reply || "Api Error";
+            return cleanMessageText(order.apiResponse?.reply) || "Api Error";
           default:
             return "No messages yet";
         }
@@ -3804,29 +4162,7 @@
         }
       }
 
-      // Check request status - follows Tellabot API documentation
-      async function checkRequestStatus(orderId) {
-        try {
-          const result = await makeAPICall(
-            `/user/api/request-status/${orderId}`,
-            {
-              method: "GET",
-            }
-          );
-
-          if (result.success) {
-            showAlert("Request status updated successfully!", "success");
-            await loadExistingOrders(); // Refresh the orders table
-          } else {
-            showAlert(
-              result.message || "Failed to check request status",
-              "error"
-            );
-          }
-        } catch (error) {
-          showAlert(error.message || "Failed to check request status", "error");
-        }
-      }
+  // Removed checkRequestStatus function permanently
 
       // Reject MDN - follows Tellabot API documentation
       async function rejectMDN(orderId) {
@@ -3871,55 +4207,7 @@
         }
       }
 
-      // Debug API Response - shows detailed information about apiResponse field
-      function debugApiResponse(orderId) {
-        const order = currentOrders.find((o) => (o._id || o.id) === orderId);
-
-        if (!order) {
-          showAlert("Order not found in current data", "error");
-          return;
-        }
-
-        let debugInfo = `=== DEBUG INFO FOR ORDER ${orderId} ===\n\n`;
-        debugInfo += `Status: ${order.status}\n`;
-        debugInfo += `Service: ${order.service}\n`;
-        debugInfo += `Number: ${order.number}\n\n`;
-
-        debugInfo += `=== API RESPONSE FIELD ===\n`;
-        if (order.apiResponse) {
-          debugInfo += `✅ apiResponse EXISTS\n`;
-          debugInfo += `Raw apiResponse: ${JSON.stringify(
-            order.apiResponse,
-            null,
-            2
-          )}\n\n`;
-          debugInfo += `Pin: "${order.apiResponse.pin}"\n`;
-          debugInfo += `Reply: "${order.apiResponse.reply}"\n`;
-          debugInfo += `Timestamp: ${order.apiResponse.timestamp}\n`;
-          debugInfo += `Date/Time: ${order.apiResponse.date_time}\n`;
-          debugInfo += `From: ${order.apiResponse.from}\n`;
-          debugInfo += `To: ${order.apiResponse.to}\n`;
-          debugInfo += `Service: ${order.apiResponse.service}\n`;
-          debugInfo += `Price: ${order.apiResponse.price}\n`;
-        } else {
-          debugInfo += `❌ apiResponse DOES NOT EXIST\n`;
-        }
-
-        debugInfo += `\n=== OTHER FIELDS ===\n`;
-        debugInfo += `pin: "${order.pin}"\n`;
-        debugInfo += `code: "${order.code}"\n`;
-        debugInfo += `sms: "${order.sms}"\n`;
-        debugInfo += `text: "${order.text}"\n`;
-        debugInfo += `message: "${order.message}"\n`;
-        debugInfo += `reply: "${order.reply}"\n`;
-
-        debugInfo += `\n=== WHAT WILL BE DISPLAYED ===\n`;
-        debugInfo += `PIN Column: "${extractPinFromOrder(order)}"\n`;
-        debugInfo += `Message Column: "${getMessageFromOrder(order)}"\n`;
-
-        console.log(debugInfo);
-        alert(debugInfo);
-      }
+  // Removed debugApiResponse function permanently
 
       // Test function to simulate API response (for debugging only)
       function simulateApiResponse() {
@@ -4181,9 +4469,12 @@
       setVH();
 
       // Cleanup on page unload
-      window.addEventListener("beforeunload", () => {
+      window.addEventListener('page-hidden', () => {
+                        window.intervalManager.clearAll();
+                    });
+                    window.addEventListener('beforeunload', () => {
         if (balanceRefreshInterval) {
-          clearInterval(balanceRefreshInterval);
+          clearInterval('balanceRefresh');
         }
       });
     </script>

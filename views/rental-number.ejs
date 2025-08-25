@@ -14,19 +14,21 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/rental-number.css">
+    <!-- Lottie Player -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <!-- Custom CSS with cache-busting to avoid stale styles -->
+    <link rel="stylesheet" href="/css/rental-number.css?v=<%= cacheBuster || '' %>">
   </head>
   <body>
     <div class="dashboard-container">
       <!-- Sidebar -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-          <a href="/user/index" class="logo">
+                          <a href="/user/dashboard" class="logo">
             <div class="logo-container">
               <div class="logo-icon">
                 <img
-                  src="/assets/images/codebypass-logo/codebypass-icon-white-bg.png"
+                  src="/assets/images/codebypass-logo/codebypass-logo-white-text-bg.png"
                   alt="CodeByPass Icon"
                 />
               </div>
@@ -42,7 +44,7 @@
         <div class="sidebar-menu">
           <ul>
             <li class="menu-item">
-              <a href="/user/index" class="menu-link">
+                              <a href="/user/dashboard" class="menu-link">
                 <span class="menu-icon"><i class="fas fa-th-large"></i></span>
                 <span class="menu-text">Dashboard</span>
               </a>
@@ -300,9 +302,6 @@
               >
                 <i class="fas fa-sync-alt"></i> Refresh
               </button>
-              <button class="btn btn-outline btn-sm" onclick="testAPI()">
-                <i class="fas fa-vial"></i> Test API
-              </button>
             </div>
             <div class="card-body">
               <!-- Filters Section -->
@@ -372,20 +371,29 @@
                 <table class="table">
                   <thead>
                     <tr>
-                      <th>Created at</th>
-                      <th>Number</th>
                       <th>Service</th>
-                      <th>Duration</th>
-                      <th>Status</th>
-                      <th>Expires At</th>
+                      <th>MDN</th>
                       <th>Price</th>
+                      <th>Purchased</th>
+                      <th>Expires</th>
+                      <th>Online Status</th>
+                      <th>Online Window</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody id="rentals-table-body">
                     <tr>
                       <td data-label="No Data" colspan="8" class="table-empty">
-                        Loading rentals...
+                        <div class="lottie-container" style="text-align: center; padding: 20px;">
+                          <lottie-player
+                            src="/assets/animations/Loading search glass.json"
+                            background="transparent"
+                            speed="1"
+                            style="width: 200px; height: 200px; margin: 0 auto;"
+                            loop
+                            autoplay>
+                          </lottie-player>
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -402,6 +410,34 @@
     <!-- JavaScript -->
     <!-- Add this script section at the bottom of the file, before the closing </body> tag -->
     <script>
+      // Suppress noisy console logs and keep only our API traces
+      (function() {
+        const noop = function(){};
+        console.log = noop;
+        console.warn = noop;
+        console.error = noop;
+        console.debug = noop;
+      })();
+
+      async function apiCall(url, options = {}) {
+        try {
+          const method = options.method || 'GET';
+          let bodyPreview = undefined;
+          if (options.body) {
+            try { bodyPreview = JSON.parse(options.body); } catch (_) { bodyPreview = options.body; }
+          }
+          console.info('[REQUEST]', method, url, bodyPreview);
+          const res = await fetch(url, options);
+          let data;
+          try { data = await res.clone().json(); } catch (_) { data = await res.text(); }
+          console.info('[RESPONSE]', res.status, url, data);
+          if (!res.ok) throw new Error((data && data.message) || `HTTP ${res.status}`);
+          return data;
+        } catch (e) {
+          console.info('[ERROR]', url, e?.message || e);
+          throw e;
+        }
+      }
       // API Helper Functions
       // DOM Elements
       const sidebar = document.getElementById("sidebar");
@@ -504,7 +540,13 @@
       }
 
       // Clean up intervals on page unload
-      window.addEventListener("beforeunload", function() {
+      window.addEventListener('page-hidden', () => {
+        if (window.intervalManager) {
+          window.intervalManager.clearAll();
+        }
+      });
+      
+      window.addEventListener('beforeunload', function() {
         console.log("Page unloading, cleaning up intervals...");
         if (window.balanceRefreshInterval) {
           clearInterval(window.balanceRefreshInterval);
@@ -513,6 +555,10 @@
         if (window.rentalsRefreshInterval) {
           clearInterval(window.rentalsRefreshInterval);
           window.rentalsRefreshInterval = null;
+        }
+        if (activeWindowTimer) {
+          clearInterval(activeWindowTimer);
+          activeWindowTimer = null;
         }
       });
 
@@ -527,6 +573,10 @@
           if (window.rentalsRefreshInterval) {
             clearInterval(window.rentalsRefreshInterval);
             window.rentalsRefreshInterval = null;
+          }
+          if (activeWindowTimer) {
+            clearInterval(activeWindowTimer);
+            activeWindowTimer = null;
           }
         } else {
           console.log("Page visible, resuming intervals...");
@@ -550,8 +600,18 @@
           logoutButton.addEventListener("click", function (e) {
             e.preventDefault();
             // Clear any intervals before logging out
-            if (window.balanceRefreshInterval) clearInterval(window.balanceRefreshInterval);
-            if (window.rentalsRefreshInterval) clearInterval(window.rentalsRefreshInterval);
+            if (window.balanceRefreshInterval) {
+              clearInterval(window.balanceRefreshInterval);
+              window.balanceRefreshInterval = null;
+            }
+            if (window.rentalsRefreshInterval) {
+              clearInterval(window.rentalsRefreshInterval);
+              window.rentalsRefreshInterval = null;
+            }
+            if (activeWindowTimer) {
+              clearInterval(activeWindowTimer);
+              activeWindowTimer = null;
+            }
             window.location.href = "/user/signout";
           });
         }
@@ -571,6 +631,42 @@
         setTimeout(() => alertDiv.remove(), 5000);
       }
 
+      // Map realtime status to badge class
+      function getBadgeClassForRealtimeStatus(status) {
+        const s = String(status || '').toLowerCase();
+        if (s === 'online') return 'badge-success';
+        if (s === 'activating' || s === 'pending' || s === 'processing') return 'badge-warning';
+        if (s === 'cancelled' || s === 'rejected' || s === 'released') return 'badge-secondary';
+        if (s === 'expired') return 'badge-warning';
+        if (s === 'offline' || s === 'error' || s === 'failed' || s === 'unknown') return 'badge-danger';
+        return 'badge-primary';
+      }
+
+      function formatRealtimeStatusForDisplay(status) {
+        const s = String(status || '').toLowerCase();
+        if (s === 'failed') return 'Rejected';
+        if (s === 'cancelled' || s === 'released') return 'Released';
+        if (s === 'rejected') return 'Rejected';
+        if (s === 'expired') return 'Expired';
+        if (s === 'online' || s === 'offline' || s === 'activating' || s === 'processing' || s === 'pending') return s;
+        return '';
+      }
+
+      // Update the table row badge for realtime status
+      function setRowRealtimeStatus(rentalId, ltrStatus) {
+        try {
+          const badge = document.getElementById(`status-badge-${rentalId}`);
+          if (!badge) return;
+          // Reset any existing badge-* class
+          badge.classList.remove('badge-success', 'badge-warning', 'badge-danger', 'badge-primary');
+          badge.classList.add(getBadgeClassForRealtimeStatus(ltrStatus));
+          badge.textContent = formatRealtimeStatusForDisplay(ltrStatus);
+          // Persist cache so refresh reflects backend states like rejected
+          realtimeStatusById[rentalId] = (ltrStatus || '').toString().toLowerCase();
+          saveRealtimeCache();
+        } catch (_) {}
+      }
+
       // DOM Elements
       const serviceSelect = document.getElementById("rental-service");
       const stateSelect = document.getElementById("rental-state");
@@ -580,6 +676,21 @@
       let currentRentals = [];
       let filteredRentals = [];
       let selectedService = null;
+      let isLoadingRentals = false;
+      // Keep last-known realtime status per rental to persist across table refreshes
+      const realtimeStatusById = {};
+      // Active window timers (only one should run at a time)
+      let activeWindowRentalId = null;
+      let activeWindowTimer = null;
+      let activeWindowRemaining = { till: 0, next: 0 };
+      const realtimeCacheKey = 'rentalRealtimeStatus';
+      try {
+        const cached = JSON.parse(localStorage.getItem(realtimeCacheKey) || '{}');
+        Object.assign(realtimeStatusById, cached);
+      } catch (_) {}
+      function saveRealtimeCache() {
+        try { localStorage.setItem(realtimeCacheKey, JSON.stringify(realtimeStatusById)); } catch (_) {}
+      }
 
       // Make dropdown functions globally accessible
       window.toggleDropdown = function (dropdownId) {
@@ -768,11 +879,7 @@
                 refreshBalance();
               }, 1000);
 
-              // Also try an immediate refresh in case the delay isn't needed
-              setTimeout(() => {
-                console.log("Second loadRentals call after order creation...");
-                loadRentals();
-              }, 2500);
+              // Avoid duplicate refresh calls
             } else {
               showAlert(
                 data.message || "Failed to create rental order",
@@ -786,61 +893,7 @@
           });
       };
 
-      // Function to test API connectivity
-      function testAPI() {
-        console.log("🧪 Testing API connectivity...");
-        showAlert("Testing API...", "info");
-
-        // First test unprotected endpoint
-        console.log("🏓 Testing ping endpoint...");
-        fetch("/user/api/ping")
-          .then((response) => {
-            console.log("🏓 Ping response status:", response.status);
-            return response.json();
-          })
-          .then((data) => {
-            console.log("🏓 Ping response data:", data);
-            showAlert(
-              "Ping test successful! Testing protected endpoint...",
-              "success"
-            );
-
-            // Now test protected endpoint
-            return fetch("/user/api/test");
-          })
-          .then((response) => {
-            console.log("🧪 Test API response status:", response.status);
-            return response.json();
-          })
-          .then((data) => {
-            console.log("🧪 Test API response data:", data);
-            showAlert("Protected API test successful!", "success");
-          })
-          .catch((error) => {
-            console.error("🧪 API test error:", error);
-            showAlert("API test failed: " + error.message, "error");
-          });
-      }
-
-      // Function to test ping (unprotected endpoint)
-      function testPing() {
-        console.log("🏓 Testing ping endpoint...");
-        showAlert("Testing ping...", "info");
-
-        fetch("/user/api/ping")
-          .then((response) => {
-            console.log("🏓 Ping response status:", response.status);
-            return response.json();
-          })
-          .then((data) => {
-            console.log("🏓 Ping response data:", data);
-            showAlert("Ping successful!", "success");
-          })
-          .catch((error) => {
-            console.error("🏓 Ping error:", error);
-            showAlert("Ping failed: " + error.message, "error");
-          });
-      }
+      // Test functions removed
 
       // Function to force refresh rentals (for manual refresh button)
       function forceRefreshRentals() {
@@ -857,13 +910,18 @@
 
       // Function to load rentals
       function loadRentals() {
+        if (isLoadingRentals) {
+          console.log("Skipping loadRentals; already loading.");
+          return;
+        }
+        isLoadingRentals = true;
         console.log("Loading rentals..."); // Debug log
 
         // Show loading state
         const tbody = document.getElementById("rentals-table-body");
         if (tbody) {
           tbody.innerHTML =
-            '<tr><td data-label="Loading" colspan="8" class="table-empty">Loading rentals...</td></tr>';
+            '<tr><td data-label="Loading" colspan="8" class="table-empty"><div class="lottie-container" style="text-align: center; padding: 20px;"><lottie-player src="/assets/animations/Loading search glass.json" background="transparent" speed="1" style="width: 200px; height: 200px; margin: 0 auto;" loop autoplay></lottie-player></div></td></tr>';
         }
 
         console.log("🚀 Starting fetch request to /user/api/rentals"); // Debug log
@@ -916,13 +974,16 @@
             console.error("Error loading rentals:", error);
             currentRentals = [];
             filteredRentals = [];
-            updateRentalsTable(filteredRentals);
+            updateRentalsTable(filteredRentals, true); // Pass error flag
             showAlert("Failed to load rentals", "error");
+          })
+          .finally(() => {
+            isLoadingRentals = false;
           });
       }
 
       // Function to update rentals table
-      function updateRentalsTable(rentals) {
+      function updateRentalsTable(rentals, isError = false) {
         console.log("Updating table with rentals:", rentals); // Debug log
         const tbody = document.getElementById("rentals-table-body");
         // Debug log
@@ -934,9 +995,16 @@
 
         tbody.innerHTML = "";
 
+        // Handle error state
+        if (isError) {
+          tbody.innerHTML =
+            '<tr><td data-label="Error" colspan="8" class="table-empty"><div style="text-align: center; padding: 40px 20px;"><i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i><div style="color: var(--gray-500); font-size: 1rem; margin-bottom: 0.5rem;">Failed to load rentals</div><div style="color: var(--gray-400); font-size: 0.875rem;">Please refresh the page or try again later</div><button onclick="loadRentals()" class="btn btn-outline" style="margin-top: 1rem;"><i class="fas fa-redo"></i> Retry</button></div></td></tr>';
+          return;
+        }
+
         if (!rentals || rentals.length === 0) {
           tbody.innerHTML =
-            '<tr><td data-label="No Data" colspan="8" class="table-empty">No records found</td></tr>';
+            '<tr><td data-label="No Data" colspan="8" class="table-empty"><div style="text-align: center; padding: 40px 20px;"><i class="fas fa-phone-slash" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem;"></i><div style="color: var(--gray-500); font-size: 1rem; margin-bottom: 0.5rem;">No rental numbers found</div><div style="color: var(--gray-400); font-size: 0.875rem;">Start by renting your first number above</div></td></tr>';
           return;
         }
 
@@ -951,26 +1019,36 @@
           }
 
           const row = document.createElement("tr");
-          const statusClass =
-            rental.status === "active"
-              ? "success"
-              : rental.status === "expired"
-              ? "warning"
-              : "danger";
           const durationBadge =
             rental.duration === "3days" ? "duration-3days" : "duration-30days";
+          const rentalId = rental._id || rental.id;
+          const initialRealtimeStatus = realtimeStatusById[rentalId] || null;
+          const initialBadgeClass = getBadgeClassForRealtimeStatus(initialRealtimeStatus || 'unknown');
+
+          // Calculate formatted dates
+          const purchasedDate = rental.startDate ? new Date(rental.startDate).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          }) : (rental.createdAt ? new Date(rental.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          }) : "N/A");
+
+          const expiresDate = rental.expiresAt ? new Date(rental.expiresAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          }) : "N/A";
 
           row.innerHTML = `
-            <td data-label="Created at">${
-              rental.createdAt
-                ? new Date(rental.createdAt).toLocaleString()
-                : "N/A"
-            }</td>
-            <td data-label="Number">
+            <td data-label="Service">${rental.service || "N/A"}</td>
+            <td data-label="MDN">
               <div class="number-cell">
                 <span class="phone-number">${rental.number || "Pending"}</span>
                 ${
-                  rental.number
+                  rental.number && rental.number !== "Pending"
                     ? `<button class="copy-btn" onclick="copyToClipboard('${rental.number}')" title="Copy number">
                   <i class="fas fa-copy"></i>
                 </button>`
@@ -978,26 +1056,54 @@
                 }
               </div>
             </td>
-            <td data-label="Service">${rental.service || "N/A"}</td>
-            <td data-label="Duration">
-              <span class="badge ${durationBadge}">${
-            rental.duration === "3days" ? "3 Days" : "30 Days"
-          }</span>
-            </td>
-            <td data-label="Status">
-              <span class="badge badge-${statusClass}">${
-            rental.status || "pending"
-          }</span>
-            </td>
-            <td data-label="Expires At">${
-              rental.expiresAt
-                ? new Date(rental.expiresAt).toLocaleString()
-                : "N/A"
-            }</td>
             <td data-label="Price">$${(rental.price || 0).toFixed(2)}</td>
+            <td data-label="Purchased">
+              <span class="date-text">${purchasedDate}</span>
+              <br>
+              <small class="time-text">${rental.startDate ? new Date(rental.startDate).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+              }) : (rental.createdAt ? new Date(rental.createdAt).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+              }) : "")}</small>
+            </td>
+            <td data-label="Expires">
+              <span class="date-text">${expiresDate}</span>
+              <br>
+              <small class="time-text">${rental.expiresAt ? new Date(rental.expiresAt).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+              }) : ""}</small>
+            </td>
+            <td data-label="Online Status">
+              <span id="status-badge-${rentalId}" class="badge ${initialBadgeClass}">${
+            formatRealtimeStatusForDisplay(initialRealtimeStatus || 'unknown')
+          }</span>
+            </td>
+            <td data-label="Online Window">
+              <span class="online-window" id="window-${rentalId}"></span>
+            </td>
             <td data-label="Actions" class="actions-cell">
               <div class="action-buttons">
-                
+                <button class="action-btn" onclick="checkLtrStatus('${
+                  rental._id || rental.id
+                }')" title="Check Online Status">
+                  <i class="fas fa-signal"></i>
+                </button>
+                <button class="action-btn" onclick="activateLtr('${
+                  rental._id || rental.id
+                }')" title="Activate Number">
+                  <i class="fas fa-bolt"></i>
+                </button>
+                <button class="action-btn" onclick="checkRentalSMS('${
+                  rental._id || rental.id
+                }')" title="Check Messages">
+                  <i class="fas fa-envelope-open-text"></i>
+                </button>
                 <button class="action-btn dislike-btn ${
                   rental.actions?.dislike ? "active" : ""
                 }" 
@@ -1007,21 +1113,32 @@
                         title="Toggle Dislike" data-action="dislike">
                   <i class="fas fa-thumbs-down"></i>
                 </button>
-            
                 <button class="action-btn renew-btn" onclick="renewOrder('${
                   rental._id || rental.id
-                }')" 
-                        title="Renew Order" data-action="renew">
+                }')" title="Renew Order" data-action="renew">
                   <i class="fas fa-redo"></i>
+                </button>
+                <button class="action-btn" onclick="releaseRental('${
+                  rental._id || rental.id
+                }')" title="Release Rental">
+                  <i class="fas fa-times-circle"></i>
                 </button>
               </div>
             </td>
           `;
-          console.log(
-            "Appending row to table for rental:",
-            rental.id || rental._id
-          ); // Debug log
+          console.log("Appending row to table for rental:", rentalId); // Debug log
           tbody.appendChild(row);
+
+          // Details row (hidden by default)
+          const detailsRow = document.createElement('tr');
+          detailsRow.className = 'details-row';
+          detailsRow.id = `details-${rental._id || rental.id}`;
+          detailsRow.innerHTML = `
+            <td colspan="8" style="padding:0; border-top: none;">
+              <div id="details-panel-${rental._id || rental.id}" class="details-panel" style="display:none"></div>
+            </td>
+          `;
+          tbody.appendChild(detailsRow);
         });
         console.log("Finished updating table"); // Debug log
       }
@@ -1112,6 +1229,117 @@
       }
 
       // Action functions
+      async function checkLtrStatus(rentalId) {
+        try {
+          const data = await apiCall(`/user/api/rentals/${rentalId}/status`);
+          if (!data.success) throw new Error(data.message || 'Failed');
+          const msg = data.data || {};
+          const status = msg.ltr_status || 'unknown';
+          const till = typeof msg.till_change !== 'undefined' ? msg.till_change : 'N/A';
+          const next = typeof msg.next_online !== 'undefined' ? msg.next_online : 'N/A';
+          showAlert(`Status: ${status} | Active for: ${till}s | Next online: ${next}s`, status === 'online' ? 'success' : 'info');
+
+          // Reflect realtime status in table and cache
+          setRowRealtimeStatus(rentalId, status);
+
+          // Show dynamic active window ONLY for this rental
+          const t = Number(till) || 0;
+          const n = Number(next) || 0;
+          startActiveWindowTimer(rentalId, t, n);
+
+          // Render status in details panel
+          const panel = document.getElementById(`details-panel-${rentalId}`);
+          const drow = document.getElementById(`details-${rentalId}`);
+          if (panel && drow) {
+            const rental = currentRentals.find(r => (r._id||r.id) === rentalId);
+            const mdn = rental?.number || '';
+            panel.style.display = 'block';
+            drow.style.display = '';
+            panel.innerHTML = `
+              <div class="details-section">
+                <div class="details-header">
+                  <strong>Status</strong>
+                  <span class="badge ${status==='online'?'badge-success':'badge-warning'}" style="margin-left:8px;">${status}</span>
+                  <span style="margin-left:12px;color:#6b7280;">MDN: ${mdn}</span>
+                </div>
+                <div class="details-grid">
+                  <div><span class="muted">Active window (till_change)</span><div class="kv">${till}s</div></div>
+                  <div><span class="muted">Next online</span><div class="kv">${next}s</div></div>
+                  <div><span class="muted">Server time</span><div class="kv">${msg.date_time||''}</div></div>
+                </div>
+              </div>
+            `;
+          }
+        } catch (e) {
+          showAlert(e.message || 'Status check failed', 'error');
+        }
+      }
+
+      async function activateLtr(rentalId) {
+        try {
+          showAlert('Activating number...', 'info');
+          const data = await apiCall(`/user/api/rentals/${rentalId}/activate`, { method: 'POST' });
+          if (!data.success) throw new Error(data.message || 'Activation failed');
+          const msg = data.data || {};
+          const status = msg.ltr_status || 'unknown';
+          const till = typeof msg.till_change !== 'undefined' ? msg.till_change : 'N/A';
+          const next = typeof msg.next_online !== 'undefined' ? msg.next_online : 'N/A';
+          showAlert(`Activated. Status: ${status} | Active for: ${till}s | Next online: ${next}s`, 'success');
+
+          // Persist and reflect realtime status in table
+          realtimeStatusById[rentalId] = status;
+          saveRealtimeCache();
+          setRowRealtimeStatus(rentalId, status);
+
+          // Start dynamic window timer for this rental only
+          const t = Number(till) || 0;
+          const n = Number(next) || 0;
+          startActiveWindowTimer(rentalId, t, n);
+        } catch (e) {
+          showAlert(e.message || 'Activation failed', 'error');
+        }
+      }
+
+      async function checkRentalSMS(rentalId) {
+        try {
+          const data = await apiCall(`/user/api/rentals/${rentalId}/messages`);
+          if (!data.success) throw new Error(data.message || 'Failed to fetch messages');
+          const messages = data.messages || [];
+          const panel = document.getElementById(`details-panel-${rentalId}`);
+          const drow = document.getElementById(`details-${rentalId}`);
+          if (!panel || !drow) return;
+
+          const rental = currentRentals.find(r => (r._id||r.id) === rentalId);
+          const mdn = rental?.number || '';
+
+          let content = '';
+          if (!messages.length) {
+            content = `<div class="details-section"><div class="details-header"><strong>Messages</strong></div><div class="muted">No messages yet</div></div>`;
+          } else {
+            const last = messages[messages.length - 1];
+            const text = last.reply || last.message || last.text || '';
+            content = `
+              <div class="details-section">
+                <div class="details-header"><strong>All messages (${messages.length})</strong></div>
+                <div class="messages-list">
+                  ${messages.map(m => `
+                    <div class="message-item">
+                      <div class="message-meta">${m.date_time || ''} · From: ${m.from || ''}</div>
+                      <div class="message-text">${(m.reply||m.message||m.text||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          }
+
+          panel.innerHTML = content;
+          panel.style.display = 'block';
+          drow.style.display = '';
+        } catch (e) {
+          showAlert(e.message || 'Failed to check messages', 'error');
+        }
+      }
       function checkMessages(rentalId) {
         showAlert("Checking messages...", "info");
 
@@ -1272,9 +1500,7 @@
       // New action functions for the updated buttons
       async function toggleAction(rentalId, actionType) {
         try {
-          const result = await fetch(
-            `/user/api/rentals/${rentalId}/toggle-action`,
-            {
+          const result = await fetch(`/user/api/rentals/${rentalId}/toggle-action`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -1311,10 +1537,10 @@
       }
 
       async function renewOrder(rentalId) {
-        if (!confirm("Are you sure you want to renew this order?")) return;
+        if (!confirm("Are you sure you want to renew this rental? This will extend the rental period and charge your account.")) return;
 
         try {
-          showAlert("Renewing order...", "info");
+          showAlert("Processing renewal...", "info");
 
           const result = await fetch(`/user/api/rentals/${rentalId}/renew`, {
             method: "POST",
@@ -1326,15 +1552,57 @@
           const data = await result.json();
 
           if (data.success) {
-            showAlert("Order renewed successfully!", "success");
+            showAlert(data.message || "Rental renewed successfully!", "success");
+            
+            // Show extension details if available
+            if (data.extensionDetails) {
+              const { previousExpiry, newExpiry, daysExtended } = data.extensionDetails;
+              const prevDate = new Date(previousExpiry).toLocaleDateString();
+              const newDate = new Date(newExpiry).toLocaleDateString();
+              
+              setTimeout(() => {
+                showAlert(`Extended by ${daysExtended} days: ${prevDate} → ${newDate}`, "info");
+              }, 2000);
+            }
+            
             loadRentals();
             refreshBalance();
           } else {
-            showAlert(data.message || "Failed to renew order", "error");
+            showAlert(data.message || "Failed to renew rental", "error");
           }
         } catch (error) {
-          console.error("Error renewing order:", error);
-          showAlert("Failed to renew order", "error");
+          console.error("Error renewing rental:", error);
+          showAlert("Failed to renew rental", "error");
+        }
+      }
+
+      async function releaseRental(rentalId) {
+        if (!confirm("Are you sure you want to release this rental? This cannot be undone and is allowed only before any SMS is received.")) return;
+        try {
+          showAlert("Releasing rental...", "info");
+          const res = await fetch(`/user/api/rentals/${rentalId}/release`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
+          const data = await res.json();
+          if (data.success) {
+            showAlert("Rental released successfully!", "success");
+            // Stop any running short timer for this rental immediately
+            if (activeWindowRentalId === rentalId && activeWindowTimer) {
+              clearInterval(activeWindowTimer); 
+              activeWindowTimer = null; 
+              activeWindowRentalId = null;
+            }
+            const el = document.getElementById(`window-${rentalId}`);
+            if (el) el.textContent = '';
+            setRowRealtimeStatus(rentalId, 'rejected');
+            loadRentals();
+            refreshBalance();
+          } else {
+            showAlert(data.message || "Failed to release rental", "error");
+          }
+        } catch (e) {
+          showAlert(e.message || "Failed to release rental", "error");
         }
       }
 
@@ -1364,8 +1632,14 @@
         console.log("Page loaded, initializing...");
         
         // Clear any existing intervals first (in case of reload)
-        if (window.balanceRefreshInterval) clearInterval(window.balanceRefreshInterval);
-        if (window.rentalsRefreshInterval) clearInterval(window.rentalsRefreshInterval);
+        if (window.balanceRefreshInterval) {
+          clearInterval(window.balanceRefreshInterval);
+          window.balanceRefreshInterval = null;
+        }
+        if (window.rentalsRefreshInterval) {
+          clearInterval(window.rentalsRefreshInterval);
+          window.rentalsRefreshInterval = null;
+        }
         
         refreshBalance();
 
@@ -1392,12 +1666,92 @@
 
         // Set up periodic balance refresh (every 30 seconds) - with safety check
         if (!window.balanceRefreshInterval) {
-          window.balanceRefreshInterval = setInterval(refreshBalance, 30000);
+          window.balanceRefreshInterval = setInterval('balance-refresh', refreshBalance, 30000);
         }
 
         // Set up periodic rentals refresh (every 2 minutes) - with safety check
         if (!window.rentalsRefreshInterval) {
-          window.rentalsRefreshInterval = setInterval(loadRentals, 120000);
+          window.rentalsRefreshInterval = setInterval('rentals-refresh', loadRentals, 120000);
+        }
+
+        // No long-term expiry countdown needed now; we show only the short online window
+
+        // Active realtime window updater (only for the active rental)
+        function renderActiveWindow() {
+          if (!activeWindowRentalId) return;
+          const el = document.getElementById(`window-${activeWindowRentalId}`);
+          if (!el) return;
+          const till = Math.max(0, activeWindowRemaining.till);
+          const next = Math.max(0, activeWindowRemaining.next);
+          const fmt = (sec) => {
+            const s = Math.max(0, Math.floor(sec));
+            const m = Math.floor(s / 60);
+            const r = s % 60;
+            return `${m.toString().padStart(2,'0')}:${r
+              .toString()
+              .padStart(2,'0')}`;
+          };
+          // Determine current status badge to decide label
+          const badge = document.getElementById(`status-badge-${activeWindowRentalId}`);
+          const statusText = (badge?.textContent || '').toLowerCase();
+          if (till > 0 && statusText === 'online') {
+            el.textContent = `Available for: ${fmt(till)}`;
+          } else if (next > 0) {
+            el.textContent = `Available in: ${fmt(next)}`;
+          } else {
+            el.textContent = '';
+          }
+        }
+
+        window.startActiveWindowTimer = function (rentalId, tillSeconds, nextSeconds) {
+          // Stop previous timer properly
+          if (activeWindowTimer) { 
+            clearInterval(activeWindowTimer); 
+            activeWindowTimer = null; 
+          }
+          
+          // Clear previous rental's window display
+          if (activeWindowRentalId && activeWindowRentalId !== rentalId) {
+            const prev = document.getElementById(`window-${activeWindowRentalId}`);
+            if (prev) prev.textContent = '';
+          }
+          
+          // Set new active rental
+          activeWindowRentalId = rentalId;
+          
+          // Sync timing with server response timestamp to reduce drift
+          const serverTime = Date.now();
+          activeWindowRemaining = { 
+            till: Math.max(0, tillSeconds), 
+            next: Math.max(0, nextSeconds),
+            startTime: serverTime
+          };
+          
+          // Initial render
+          renderActiveWindow();
+          
+          // Start new timer with better synchronization
+          activeWindowTimer = setInterval(() => {
+            // Calculate elapsed time since server response
+            const elapsedMs = Date.now() - activeWindowRemaining.startTime;
+            const elapsedSeconds = Math.floor(elapsedMs / 1000);
+            
+            // Calculate remaining time based on server values minus elapsed time
+            const originalTill = Math.max(0, tillSeconds);
+            const originalNext = Math.max(0, nextSeconds);
+            
+            activeWindowRemaining.till = Math.max(0, originalTill - elapsedSeconds);
+            activeWindowRemaining.next = Math.max(0, originalNext - elapsedSeconds);
+            
+            renderActiveWindow();
+            
+            // Stop timer when both counters reach zero
+            if (activeWindowRemaining.till === 0 && activeWindowRemaining.next === 0) {
+              clearInterval(activeWindowTimer);
+              activeWindowTimer = null;
+              activeWindowRentalId = null;
+            }
+          }, 1000);
         }
       });
 
@@ -1409,7 +1763,7 @@
 
         try {
           serviceOptions.innerHTML =
-            '<div class="option"><span class="option-text">Loading services...</span></div>';
+            '<div class="option"><div class="lottie-container" style="text-align: center; padding: 15px;"><lottie-player src="/assets/animations/Loading search glass.json" background="transparent" speed="1" style="width: 120px; height: 120px; margin: 0 auto;" loop autoplay></lottie-player></div></div>';
 
           const response = await fetch("/user/api/services");
           const data = await response.json();

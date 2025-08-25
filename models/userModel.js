@@ -40,7 +40,6 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Add indexes for better query performance
-userSchema.index({ email: 1 }, { unique: true });
 userSchema.index({ username: 1 });
 userSchema.index({ createdAt: -1 });
 

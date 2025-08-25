@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="assets/images/codebypass-logo/codebypass-icon-white-bg.png">
+<link rel="icon" href="/assets/images/codebypass-logo/codebypass-icon-white-bg.png">
 <!-- reCAPTCHA script -->
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <style>
@@ -632,7 +632,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: url("/assets/images/login-sign-up-bg-codebypass.jpeg");
+        background-image: url("/assets/images/login-register-codebypass.jpg");
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
@@ -1009,10 +1009,10 @@
 <body>
     <!-- Header -->
     <header>
-        <div class="container header-container">
-        <a href="/" class="logo">
-            <img src="/assets/images/codebypass-logo/codebypass-logo-full-transparent-black-text.png" alt="CodeByPass">
-        </a>
+                    <div class="container header-container">
+            <a href="/" class="logo">
+                <img src="/assets/images/codebypass-logo/codebypass-logo-full-transparent-black-text.png" alt="CodeByPass">
+            </a>
             <div class="nav-container">
                 <nav class="main-nav">
                     <ul>
@@ -1025,8 +1025,8 @@
                 </nav>
                 
                 <div class="auth-nav">
-                    <a href="/login" class="btn btn-secondary">Login</a>
-                    <a href="/register" class="btn">Register</a>
+                    <a href="/user/login" class="btn btn-secondary">Login</a>
+                    <a href="/user/register" class="btn">Register</a>
                 </div>
             </div>
             
@@ -1056,14 +1056,16 @@
         <div class="mobile-nav-divider"></div>
         
         <div class="mobile-nav-auth">
-            <a href="/login" class="btn btn-secondary">Login</a>
-            <a href="/register" class="btn">Register</a>
+            <a href="/user/login" class="btn btn-secondary">Login</a>
+            <a href="/user/register" class="btn">Register</a>
         </div>
         
         <div class="mobile-nav-social">
-            <a href="#"><i class="fab fa-whatsapp"></i></a>
-            <a href="#"><i class="fab fa-telegram"></i></a>
-            <a href="#"><i class="fab fa-discord"></i></a>
+            <a href="https://t.me/codebypassapp" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram"></i></a>
+            <a href="https://www.youtube.com/@codebypassapp" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
+            <a href="https://www.facebook.com/codebypassapp" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.tiktok.com/@codebypassapp" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
+            <a href="https://x.com/codebypassapp" target="_blank" rel="noopener noreferrer"><i class="fab fa-x-twitter"></i></a>
         </div>
     </nav>
     
@@ -1120,8 +1122,8 @@
                                         <option value="" disabled selected>Select your preferred contact method</option>
                                         <option value="telegram">Telegram</option>
                                         <option value="teams">Microsoft Teams</option>
-                                        <option value="whatsapp">WhatsApp</option>
-                                        <option value="slack">Slack</option>
+                                        <option value="wechat">WeChat</option>
+                                        <option value="email">Email</option>
                                         <option value="discord">Discord</option>
                                     </select>
                                     <i class="fas fa-comments input-icon"></i>
@@ -1139,13 +1141,13 @@
                                 <div class="error-message" id="telegramError">Please enter a valid Telegram username (e.g., @username)</div>
                             </div>
                             
-                            <div class="form-group contact-method-input" id="whatsappInput">
-                                <label for="whatsappNumber" class="contact-method-label">WhatsApp Number</label>
+                            <div class="form-group contact-method-input" id="wechatInput">
+                                <label for="wechatUsername" class="contact-method-label">WeChat Username</label>
                                 <div class="input-wrapper">
-                                    <input type="tel" id="whatsappNumber" name="whatsappNumber" class="form-input" placeholder="+1234567890" autocomplete="off">
-                                    <i class="fab fa-whatsapp input-icon"></i>
+                                    <input type="text" id="wechatUsername" name="wechatUsername" class="form-input" placeholder="WeChat username" autocomplete="off">
+                                    <i class="fab fa-weixin input-icon"></i>
                                 </div>
-                                <div class="error-message" id="whatsappError">Please enter a valid WhatsApp number with country code (e.g., +1234567890)</div>
+                                <div class="error-message" id="wechatError">Please enter a valid WeChat username</div>
                             </div>
                             
                             <div class="form-group contact-method-input" id="teamsInput">
@@ -1157,13 +1159,13 @@
                                 <div class="error-message" id="teamsError">Please enter a valid email address</div>
                             </div>
                             
-                            <div class="form-group contact-method-input" id="slackInput">
-                                <label for="slackEmail" class="contact-method-label">Slack Email</label>
+                            <div class="form-group contact-method-input" id="emailInput">
+                                <label for="contactEmail" class="contact-method-label">Contact Email</label>
                                 <div class="input-wrapper">
-                                    <input type="email" id="slackEmail" name="slackEmail" class="form-input" placeholder="your.email@example.com" autocomplete="off">
-                                    <i class="fab fa-slack input-icon"></i>
+                                    <input type="email" id="contactEmail" name="contactEmail" class="form-input" placeholder="your.email@example.com" autocomplete="off">
+                                    <i class="fas fa-envelope input-icon"></i>
                                 </div>
-                                <div class="error-message" id="slackError">Please enter a valid email address</div>
+                                <div class="error-message" id="contactEmailError">Please enter a valid email address</div>
                             </div>
                             
                             <div class="form-group contact-method-input" id="discordInput">
@@ -1201,7 +1203,7 @@
                             
                             <!-- reCAPTCHA -->
                             <div class="recaptcha-container">
-                                <div class="g-recaptcha" data-sitekey="6LcmRHQpAAAAAKox1CmxwgV0Cbh03cU1MTc4si2g"></div>
+                                <div class="g-recaptcha" data-sitekey="<%= process.env.RECAPTCHA_SITE_KEY %>"></div>
                             </div>
 
                             <!-- Terms and Conditions Text -->
@@ -1214,7 +1216,7 @@
                             </button>
                             
                             <div class="form-footer">
-                                Already have an account? <a href="/user/signin">Login here</a>
+                                Already have an account? <a href="/user/login">Login here</a>
                             </div>
                         </form>
                     </div>
@@ -1228,14 +1230,16 @@
         <div class="container footer-container">
             <div class="footer-top">
                 <div>
-                    <div class="footer-logo">
-                        <img src="/assets/images/codebypass-logo/codebypass-logo-full-transparent-black-text.png" alt="CodeByPass">
-                    </div>
+                                    <div class="footer-logo">
+                    <img src="/assets/images/codebypass-logo/codebypass-logo-full-transparent-black-text.png" alt="CodeByPass">
+                </div>
                     <p class="footer-about">CodeByPass is your trusted partner for SMS verification services. We provide reliable, secure phone numbers for all your verification needs, protecting your privacy online.</p>
                     <div class="footer-social">
-                        <a href="#" class="footer-social-link"><i class="fab fa-whatsapp"></i></a>
-                        <a href="#" class="footer-social-link"><i class="fab fa-telegram"></i></a>
-                        <a href="#" class="footer-social-link"><i class="fab fa-discord"></i></a>
+                        <a href="https://t.me/codebypassapp" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram"></i></a>
+                        <a href="https://www.youtube.com/@codebypassapp" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.facebook.com/codebypassapp" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.tiktok.com/@codebypassapp" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
+                        <a href="https://x.com/codebypassapp" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-x-twitter"></i></a>
                     </div>
                 </div>
                 
@@ -1325,13 +1329,13 @@ window.addEventListener('scroll', () => {
 
 // Contact Method Selection Handler
 const contactMethodSelect = document.getElementById('contactMethod');
-const contactInputs = {
-    telegram: document.getElementById('telegramInput'),
-    whatsapp: document.getElementById('whatsappInput'),
-    teams: document.getElementById('teamsInput'),
-    slack: document.getElementById('slackInput'),
-    discord: document.getElementById('discordInput')
-};
+        const contactInputs = {
+            telegram: document.getElementById('telegramInput'),
+            wechat: document.getElementById('wechatInput'),
+            teams: document.getElementById('teamsInput'),
+            email: document.getElementById('emailInput'),
+            discord: document.getElementById('discordInput')
+        };
 
 // Show the appropriate input field based on selected contact method
 contactMethodSelect.addEventListener('change', function() {
@@ -1420,17 +1424,12 @@ registrationForm.addEventListener('submit', function(event) {
                 }
                 break;
                 
-            case 'whatsapp':
-                contactValue = document.getElementById('whatsappNumber').value.trim();
+            case 'wechat':
+                contactValue = document.getElementById('wechatUsername').value.trim();
                 if (!contactValue) {
-                    document.getElementById('whatsappError').textContent = "WhatsApp number is required";
-                    document.getElementById('whatsappError').classList.add('visible');
-                    document.getElementById('whatsappNumber').classList.add('error');
-                    contactValid = false;
-                } else if (!/^\+[1-9]\d{1,14}$/.test(contactValue)) {
-                    document.getElementById('whatsappError').textContent = "Please enter a valid WhatsApp number with country code (e.g., +1234567890)";
-                    document.getElementById('whatsappError').classList.add('visible');
-                    document.getElementById('whatsappNumber').classList.add('error');
+                    document.getElementById('wechatError').textContent = "WeChat username is required";
+                    document.getElementById('wechatError').classList.add('visible');
+                    document.getElementById('wechatUsername').classList.add('error');
                     contactValid = false;
                 }
                 break;
@@ -1445,12 +1444,12 @@ registrationForm.addEventListener('submit', function(event) {
                 }
                 break;
                 
-            case 'slack':
-                contactValue = document.getElementById('slackEmail').value.trim();
+            case 'email':
+                contactValue = document.getElementById('contactEmail').value.trim();
                 if (!contactValue || !emailRegex.test(contactValue)) {
-                    document.getElementById('slackError').textContent = "Please enter a valid email address";
-                    document.getElementById('slackError').classList.add('visible');
-                    document.getElementById('slackEmail').classList.add('error');
+                    document.getElementById('contactEmailError').textContent = "Please enter a valid email address";
+                    document.getElementById('contactEmailError').classList.add('visible');
+                    document.getElementById('contactEmail').classList.add('error');
                     contactValid = false;
                 }
                 break;

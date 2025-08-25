@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const serviceSchema = new mongoose.Schema({
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
     price: { type: Number, required: true },
     available: { type: String },
     lastUpdated: { type: Date },
@@ -12,7 +12,7 @@ const serviceSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Add indexes for better query performance
-serviceSchema.index({ name: 1 }, { unique: true });
+serviceSchema.index({ name: 1 });
 serviceSchema.index({ available: 1 });
 serviceSchema.index({ price: 1 });
 

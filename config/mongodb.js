@@ -21,23 +21,18 @@ mongoose.connection.on("disconnected", () => {
 
 export const connectUsingMongoose = async () => {
   try {
-    if (retryCount > 0) {
-      console.log(`Retrying connection (attempt ${retryCount}/${MAX_RETRIES})`);
-    }
-
-    console.log("Connecting to MongoDB...");
-
     const connectionOptions = {
-      connectTimeoutMS: 10000, // Reduced from 30s to 10s
-      socketTimeoutMS: 20000,  // Reduced from 45s to 20s
-      serverSelectionTimeoutMS: 5000,
-      maxPoolSize: 20,         // Increased pool size
-      minPoolSize: 5,          // Added minimum pool size
+      maxPoolSize: 10,         // Maintain up to 10 socket connections
+      serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+      socketTimeoutMS: 45000,  // Close sockets after 45 seconds of inactivity
+      family: 4,               // Use IPv4, skip trying IPv6
       maxIdleTimeMS: 30000,    // Close connections after 30s of inactivity
       retryWrites: true,
       w: "majority",
       tls: true,
       tlsAllowInvalidCertificates: false,
+      // Connection pool events for monitoring
+      monitorCommands: process.env.NODE_ENV === 'development'
     };
 
     await mongoose.connect(process.env.DB_URL, connectionOptions);

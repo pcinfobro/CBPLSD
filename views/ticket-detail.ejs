@@ -1908,10 +1908,10 @@ p {
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <a href="/user/index" class="logo">
+                <a href="/user/dashboard" class="logo">
                     <div class="logo-container">
                         <div class="logo-icon">
-                            <img src="/assets/images/codebypass-logo/codebypass-icon-white-bg.png" alt="CodeByPass Icon">
+                            <img src="/assets/images/codebypass-logo/codebypass-logo-white-text-bg.png" alt="CodeByPass Icon">
                         </div>
                         <img src="/assets/images/codebypass-logo/codebypass-logo-white-text-bg.png" alt="CodeByPass" class="logo-text">
                     </div>
@@ -1921,7 +1921,7 @@ p {
             <div class="sidebar-menu">
                 <ul>
                     <li class="menu-item">
-                        <a href="/user/index" class="menu-link">
+                        <a href="/user/dashboard" class="menu-link">
                             <span class="menu-icon"><i class="fas fa-th-large"></i></span>
                             <span class="menu-text">Dashboard</span>
                         </a>
@@ -2263,19 +2263,19 @@ p {
         refreshBalance();
         
         // Set up periodic balance refresh (every 30 seconds)
-        setInterval(refreshBalance, 30000);
+        setInterval('balance-refresh', refreshBalance, 30000);
     });
 
     // Update the logout functionality to clear interval
     document.querySelector('.dropdown-item:last-child').addEventListener('click', function(e) {
         e.preventDefault();
         // Clear any intervals before logging out
-        clearInterval(balanceRefreshInterval);
+        clearInterval('balanceRefresh');
         window.location.href = '/user/signout';
     });
 
     // Store the interval ID for cleanup
-    let balanceRefreshInterval = setInterval(refreshBalance, 30000);
+    let balanceRefreshInterval = setInterval('balance-refresh', refreshBalance, 30000);
     });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

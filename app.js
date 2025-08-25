@@ -8,6 +8,7 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import compression from 'compression'; // Add compression import
 import { cacheBusting, developmentCache } from './middlewares/cacheMiddleware.js';
+import { sessionCleanup, memoryMonitor, requestTimeout } from './middlewares/performanceMiddleware.js';
 import User from './models/userModel.js';
 import { connectUsingMongoose } from './config/mongodb.js';
 import router from './routes/routes.js';
@@ -25,6 +26,11 @@ const app = express();
 
 // Database connection
 connectUsingMongoose();
+
+// Performance and memory monitoring middleware
+app.use(memoryMonitor);
+app.use(requestTimeout(30000)); // 30 second timeout
+app.use(sessionCleanup);
 
 // Development cache clearing (helps with browser cache issues)
 app.use(developmentCache);
@@ -72,21 +78,23 @@ app.use(express.static('public', {
 // Optimized session configuration with MongoDB store
 app.use(session({
   secret: process.env.SESSION_SECRET || 'SecretKey',
-  resave: false,
-  saveUninitialized: false, // Changed to false to avoid creating sessions for unauthenticated users
+  resave: true, // Changed back to true for production stability
+  saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: process.env.DB_URL,
-    touchAfter: 24 * 3600, // Lazy session update - only update session once per 24 hours
-    autoRemove: 'native', // Let MongoDB handle session cleanup
+    touchAfter: 24 * 3600,
+    autoRemove: 'native',
+    autoRemoveInterval: 10,
+    ttl: 24 * 60 * 60,
     crypto: {
       secret: process.env.SESSION_SECRET || 'SecretKey'
     }
   }),
   cookie: { 
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production', // Restore proper security
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'lax' // Better security
+    maxAge: 24 * 60 * 60 * 1000,
+    sameSite: 'lax'
   }
 }));
 
@@ -141,7 +149,10 @@ app.use(async (req, res, next) => {
             res.locals.user = req.session.userData.user;
         } else {
             try {
-                const user = await User.findOne({ email: req.session.userEmail }).lean(); // Use lean() for better performance
+                const user = await User.findOne({ email: req.session.userEmail })
+                    .select('username email balance role') // Only select needed fields
+                    .lean(); // Use lean() for better performance
+                
                 if (user) {
                     const userData = {
                         username: user.username,
@@ -150,7 +161,7 @@ app.use(async (req, res, next) => {
                         role: user.role || 'Member'
                     };
                     res.locals.user = userData;
-                    // Cache user data in session
+                    // Cache user data in session with size limit
                     req.session.userData = {
                         user: userData,
                         lastFetch: Date.now()
@@ -162,10 +173,12 @@ app.use(async (req, res, next) => {
             } catch (error) {
                 console.error('User middleware error:', error);
                 res.locals.user = null;
+                delete req.session.userData;
             }
         }
     } else {
         res.locals.user = null;
+        delete req.session.userData;
     }
     next();
 });
@@ -210,7 +223,93 @@ app.use((err, req, res, next) => {
 
 
 // Routes
-app.get('/', (req, res) => res.send('Hey Ninja! Go to /user/signin to see the magic.'));
+app.get('/', (req, res) => res.redirect('/user/login'));
+
+// Navigation routes - these must be defined BEFORE /user router to work properly
+app.get('/pricing', (req, res) => {
+    // Import the controller dynamically to avoid circular dependencies
+    import('./controllers/controller.js').then(({ userGetController }) => {
+        userGetController.getSignInPage(req, res);
+    }).catch(err => {
+        console.error('Error loading controller:', err);
+        res.status(500).send('Internal Server Error');
+    });
+});
+app.get('/blog', (req, res) => {
+    import('./controllers/controller.js').then(({ userGetController }) => {
+        userGetController.getSignInPage(req, res);
+    }).catch(err => {
+        console.error('Error loading controller:', err);
+        res.status(500).send('Internal Server Error');
+    });
+});
+app.get('/api', (req, res) => {
+    import('./controllers/controller.js').then(({ userGetController }) => {
+        userGetController.getSignInPage(req, res);
+    }).catch(err => {
+        console.error('Error loading controller:', err);
+        res.status(500).send('Internal Server Error');
+    });
+});
+app.get('/contact', (req, res) => {
+    import('./controllers/controller.js').then(({ userGetController }) => {
+        userGetController.getSignInPage(req, res);
+    }).catch(err => {
+        console.error('Error loading controller:', err);
+        res.status(500).send('Internal Server Error');
+    });
+});
+app.get('/about', (req, res) => {
+    import('./controllers/controller.js').then(({ userGetController }) => {
+        userGetController.getSignInPage(req, res);
+    }).catch(err => {
+        console.error('Error loading controller:', err);
+        res.status(500).send('Internal Server Error');
+    });
+});
+app.get('/privacy', (req, res) => {
+    import('./controllers/controller.js').then(({ userGetController }) => {
+        userGetController.getSignInPage(req, res);
+    }).catch(err => {
+        console.error('Error loading controller:', err);
+        res.status(500).send('Internal Server Error');
+    });
+});
+app.get('/terms', (req, res) => {
+    import('./controllers/controller.js').then(({ userGetController }) => {
+        userGetController.getSignInPage(req, res);
+    }).catch(err => {
+        console.error('Error loading controller:', err);
+        res.status(500).send('Internal Server Error');
+    });
+});
+app.get('/faq', (req, res) => {
+    import('./controllers/controller.js').then(({ userGetController }) => {
+        userGetController.getSignInPage(req, res);
+    }).catch(err => {
+        console.error('Error loading controller:', err);
+        res.status(500).send('Internal Server Error');
+    });
+});
+
+// Add login and register routes at app level
+app.get('/login', (req, res) => {
+    import('./controllers/controller.js').then(({ userGetController }) => {
+        userGetController.getSignInPage(req, res);
+    }).catch(err => {
+        console.error('Error loading controller:', err);
+        res.status(500).send('Internal Server Error');
+    });
+});
+app.get('/register', (req, res) => {
+    import('./controllers/controller.js').then(({ userGetController }) => {
+        userGetController.getSignUpPage(req, res);
+    }).catch(err => {
+        console.error('Error loading controller:', err);
+        res.status(500).send('Internal Server Error');
+    });
+});
+
 app.use('/user', router);
 app.use('/auth', authRouter);
 

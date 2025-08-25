@@ -1839,10 +1839,10 @@ p {
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <a href="/user/index" class="logo">
+                <a href="/user/dashboard" class="logo">
                     <div class="logo-container">
                         <div class="logo-icon">
-                            <img src="/assets/images/codebypass-logo/codebypass-icon-white-bg.png" alt="CodeByPass Icon">
+                            <img src="/assets/images/codebypass-logo/codebypass-logo-white-text-bg.png" alt="CodeByPass Icon">
                         </div>
                         <img src="/assets/images/codebypass-logo/codebypass-logo-white-text-bg.png" alt="CodeByPass" class="logo-text">
                     </div>
@@ -1852,7 +1852,7 @@ p {
             <div class="sidebar-menu">
                 <ul>
                     <li class="menu-item">
-                        <a href="/user/index" class="menu-link active">
+                        <a href="/user/dashboard" class="menu-link active">
                             <span class="menu-icon"><i class="fas fa-th-large"></i></span>
                             <span class="menu-text">Dashboard</span>
                         </a>
@@ -2080,7 +2080,7 @@ p {
                                 <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
                             </div>
                             
-                            <div class="g-recaptcha" data-sitekey="6LcmRHQpAAAAAKox1CmxwgV0Cbh03cU1MTc4si2g"></div>
+                            <div class="g-recaptcha" data-sitekey="<%= process.env.RECAPTCHA_SITE_KEY %>"></div>
                             
                             <div class="profile-actions">
                                 <button type="submit" class="btn btn-primary">Change Password</button>

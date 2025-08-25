@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CBP - LSD</title>
+    <link rel="icon" href="/assets/images/codebypass-logo/codebypass-icon-white-bg.png">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <!-- Performance enhancement script -->
+    <script src="/js/performance.js?v=<%= cacheBuster || Date.now() %>"></script>
+    <!-- Performance monitoring script (development only) -->
+    <% if (process.env.NODE_ENV === 'development') { %>
+    <script src="/js/monitor.js?v=<%= cacheBuster || Date.now() %>"></script>
+    <% } %>
     <style>
         /* Add your CSS styles for the header here */
         header {
